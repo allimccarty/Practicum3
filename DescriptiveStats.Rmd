@@ -1,0 +1,141 @@
+---
+title: "Descriptive Statistics"
+author: "Allison McCarty"
+date: "4/11/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(pastecs)
+library(data.table)
+library(formattable)
+library(tidyr)
+library(mice)
+library(tibble)
+library(GGally)
+library(kableExtra)
+library(ggpubr)
+
+
+# Read in Data
+otter <- read.csv("~/Downloads/otter2.csv")
+
+#Check for NA's
+sum(apply(otter, 1, function(x){any(is.na(x))})) #84/100 observations have at least one missing value
+sum(is.na(otter$Otter)) # NONE
+sum(is.na(otter$Activity)) #NONE
+sum(is.na(otter$Altitude)) #18 MISSING VALUES
+sum(is.na(otter$Trout)) #16 MISSING VALUES
+sum(is.na(otter$Site)) #NONE
+sum(is.na(otter$Month)) #NONE
+sum(is.na(otter$Lat.)) #NONE
+sum(is.na(otter$Long.)) # NONE
+sum(is.na(otter$Caloric)) #NONE
+sum(is.na(otter$Water.Excess)) #NONE
+sum(is.na(otter$Amoeba)) #40 MISSING VALUES
+sum(is.na(otter$Land)) #NONE
+sum(is.na(otter$Water)) #40 MISSING VALUES
+sum(is.na(otter$Month.1)) #NONE
+sum(is.na(otter$Year)) #NONE
+
+#Relationship between Water and Amoeba
+all.equal(is.na(otter$Water), is.na(otter$Amoeba)) # 80 element mismatches?
+
+#Some Cleaning
+otter_raw = read.csv("~/Downloads/otter2.csv") %>%
+  mutate(
+    Altitude = replace_na(Altitude,"Unknown"),
+    Trout = replace_na(Trout,"Unkown"),
+    Amoeba = replace_na(Amoeba,"Unkown"),
+    Water = replace_na(Water,"Unkown"),
+    numMissing = rowSums(across(everything(), ~is.na(.)))
+  )
+numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
+categoricalColumns = c(1, 5)
+df_colnames = colnames(otter_raw)
+
+try_otter <- otter[-c(1,3,4,5, 11, 13)]
+
+transpose_df <- function(df) {
+  t_df <- data.table::transpose(df)
+  colnames(t_df) <- rownames(df)
+  rownames(t_df) <- colnames(df)
+  t_df <- t_df %>%
+    tibble::rownames_to_column(.data = .) %>%
+    tibble::as_tibble(.)
+  return(t_df)
+}
+
+#Data Dictionary
+
+```
+
+# The Data
+
+The data for the analysis were obtained by International Hugs for Otters (IHO).  The data was collected over the period from July 2018 to February 2020 on five  river  otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale inLake Superior, north of the state of Michigan’s upper peninsula.  Each observation is aggregated to represent otter/region  characteristics  each  month.  The data contains 100 observations of 15 variables.  Description of all variables can be found in the data dictionary of the appendix.
+
+## Examining Missing Data
+
+From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water ** reword***
+
+
+IDEA: Imputation of Altitude to the median value for each of the sites
+
+```{r}
+#Did I do this right?
+#plot = mice::md.pattern(otter_raw %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
+#View(plot)
+```
+
+## Imputing Continous Variables
+
+After determining that the four variables containing missing values (Altitude, Trout, Amoeba, Water) were all missing at random, we decided to address this issue by performing a single imputation of the median to replace the missing values.
+
+```{r}
+proportion_df = otter_raw %>%
+  group_by(Otter) %>%
+  summarize(n = n())
+
+# We have 20 observations from each site
+```
+
+
+## Descriptive Statistics
+
+```{r}
+mean_df = otter %>%
+  summarize(across(numericColumns,function(x) round(mean(x, na.rm = TRUE),2))) %>%
+  pivot_longer(everything(), names_to = "Variable",values_to = "mean") %>%
+  na.omit()
+sd_df = otter %>%
+  summarize(across(numericColumns,function(x) round(sd(x, na.rm = TRUE),2))) %>%
+  pivot_longer(everything(),names_to = "Variable",values_to = "sd") %>%
+  na.omit()
+median_df = otter %>%
+  summarize(across(numericColumns,function(x) round(median(x,na.rm = TRUE), 2))) %>%
+  pivot_longer(everything(),names_to = "Variable", values_to = "median") %>%
+  na.omit()
+pecent_missing = otter %>%
+  summarize(across(numericColumns,function(x) round((sum(is.na(x))/nrow(otter))*100,2))) %>%
+  pivot_longer(everything(),names_to = "Variable", values_to = "Missing Number") %>%
+  na.omit()
+display = inner_join(mean_df,sd_df) %>%
+  inner_join(median_df) %>%
+  inner_join(pecent_missing)
+
+ddf = transpose_df(display)
+ddf
+names(ddf) <- c("Variable","Activity","Altitude","Trout","Month","Caloric","Water.Excess","Amoeb","Land","Water","Month.1","Year")
+ddf = ddf[-1,]
+
+library(kableExtra)
+library(gridExtra)
+ddf %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 1") %>% kable_paper("hover", full_width = F)
+```
