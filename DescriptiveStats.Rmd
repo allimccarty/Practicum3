@@ -74,8 +74,7 @@ The data for the analysis were obtained by International Hugs for Otters (IHO). 
 
 ## Examining Missing Data
 
-From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  The rate of missing observations is high because two of the variables do not apply to some of the otter populations, therefore, those observations were noted as "N/A".  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water ** reword***
-
+From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water.  However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore marked as "N/A", causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
 
 
 ```{r}
@@ -87,11 +86,10 @@ View(plot)
 
 ## Data Interpolation, Imputation, and Transformation for Missing Values
 
-**incorrect** After determining that the four variables containing missing values (Altitude, Trout, Amoeba, Water) were all missing at random, we decided to address this issue by performing a single imputation of the median to replace the missing values.
 
-# Data Interpolation ofor Altitute and Trout
+#### Data Interpolation ofor Altitute and Trout
 
-The first variable with missing data is the variable representing a scaled measurement of lake trout population, which is a major food source for otters.  There were 16 observations with missing trout measurements.  For each of these, used a multiple imputation method to replace the missing observation with the mean trout value for the specific site. 
+The variables for Altitude and Trout had 18 and 16 "N/A" observations, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Observations with "N/A" for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation.  
 
 ```{r}
 otter <- otter %>%
@@ -103,9 +101,11 @@ otter <- otter %>%
   mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
 ```
 
-# Transformation  and Imputation of Ameoba and Water Variable
+#### Transformation  and Imputation of Ameoba and Water Variable
+
+
+
 ```{r}
-otter <- 
 otter$Amoeba <- otter$Amoeba +1
 otter = otter %>%
   mutate(
