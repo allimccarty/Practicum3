@@ -54,8 +54,6 @@ numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
 categoricalColumns = c(1, 5)
 df_colnames = colnames(otter_raw)
 
-try_otter <- otter[-c(1,3,4,5, 11, 13)]
-
 transpose_df <- function(df) {
   t_df <- data.table::transpose(df)
   colnames(t_df) <- rownames(df)
@@ -79,9 +77,9 @@ The data for the analysis were obtained by International Hugs for Otters (IHO). 
 From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  The rate of missing observations is high because two of the variables do not apply to some of the otter populations, therefore, those observations were noted as "N/A".  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water ** reword***
 
 
-IDEA: Imputation of Altitude to the median value for each of the sites
 
 ```{r}
+# Missingness Patter Plot
 #Did I do this right?
 plot = mice::md.pattern(otter %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
 View(plot)
@@ -89,18 +87,13 @@ View(plot)
 
 ## Data Interpolation, Imputation, and Transformation for Missing Values
 
-After determining that the four variables containing missing values (Altitude, Trout, Amoeba, Water) were all missing at random, we decided to address this issue by performing a single imputation of the median to replace the missing values.
+**incorrect** After determining that the four variables containing missing values (Altitude, Trout, Amoeba, Water) were all missing at random, we decided to address this issue by performing a single imputation of the median to replace the missing values.
 
 # Data Interpolation ofor Altitute and Trout
 
 The first variable with missing data is the variable representing a scaled measurement of lake trout population, which is a major food source for otters.  There were 16 observations with missing trout measurements.  For each of these, used a multiple imputation method to replace the missing observation with the mean trout value for the specific site. 
 
 ```{r}
-otter.compare <- otter
-sites <- c("Alpha", "Delta", "Gamma", "Omega", "Omicron")
-otter$Trout<-ave(otter$Trout,otter$Site,FUN=function(x) 
-  ifelse(is.na(x), mean(x,na.rm=TRUE), x))
-
 otter <- otter %>%
   group_by(Site) %>%
   mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE))   
@@ -110,9 +103,9 @@ otter <- otter %>%
   mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
 ```
 
-
 # Transformation  and Imputation of Ameoba and Water Variable
 ```{r}
+otter <- 
 otter$Amoeba <- otter$Amoeba +1
 otter = otter %>%
   mutate(
