@@ -3,8 +3,8 @@ title: "Descriptive Statistics"
 author: "Allison McCarty"
 date: "4/11/2021"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -52,7 +52,7 @@ all.equal(is.na(otter$Water), is.na(otter$Amoeba)) # 80 element mismatches?
 
 numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
 categoricalColumns = c(1, 5)
-df_colnames = colnames(otter_raw)
+df_colnames = colnames(otter)
 
 transpose_df <- function(df) {
   t_df <- data.table::transpose(df)
@@ -80,8 +80,8 @@ From the given data there are 100 observations. However there are 84 (84%) obser
 ```{r}
 # Missingness Patter Plot
 #Did I do this right?
-plot = mice::md.pattern(otter %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
-View(plot)
+#plot = mice::md.pattern(otter %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
+#View(plot)
 ```
 
 ## Data Interpolation, Imputation, and Transformation for Missing Values
@@ -101,7 +101,7 @@ otter <- otter %>%
   mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
 ```
 
-#### Transformation  and Imputation of Ameoba and Water Variable
+#### Transformation and Imputation of Ameoba and Water Variable
 
 The variables representing amoeba and water both had 40 "N/A" observations, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters.  
 
@@ -110,7 +110,7 @@ Both variables for Ameoba and Water represent scaled measures rather than pure m
 ```{r}
 #Add dummy variable representing if the value was missing (1) or not (0)
 otter$AmoebaNA <- ifelse(is.na(otter$Amoeba), 1, 0)
-otter$WaterNA <- ifelse(is.na(df$Water), 1, 0)
+otter$WaterNA <- ifelse(is.na(otter$Water), 1, 0)
 
 #Transformation on Amoeba
 otter$Amoeba <- otter$Amoeba +1
@@ -126,33 +126,9 @@ otter = otter %>%
 ## Descriptive Statistics
 
 ```{r}
-mean_df = otter %>%
-  summarize(across(numericColumns,function(x) round(mean(x, na.rm = TRUE),2))) %>%
-  pivot_longer(everything(), names_to = "Variable",values_to = "mean") %>%
-  na.omit()
-sd_df = otter %>%
-  summarize(across(numericColumns,function(x) round(sd(x, na.rm = TRUE),2))) %>%
-  pivot_longer(everything(),names_to = "Variable",values_to = "sd") %>%
-  na.omit()
-median_df = otter %>%
-  summarize(across(numericColumns,function(x) round(median(x,na.rm = TRUE), 2))) %>%
-  pivot_longer(everything(),names_to = "Variable", values_to = "median") %>%
-  na.omit()
-pecent_missing = otter %>%
-  summarize(across(numericColumns,function(x) round((sum(is.na(x))/nrow(otter))*100,2))) %>%
-  pivot_longer(everything(),names_to = "Variable", values_to = "Missing Number") %>%
-  na.omit()
-display = inner_join(mean_df,sd_df) %>%
-  inner_join(median_df) %>%
-  inner_join(pecent_missing)
-
-ddf = transpose_df(display)
-ddf
-names(ddf) <- c("Variable","Activity","Altitude","Trout","Month","Caloric","Water.Excess","Amoeb","Land","Water","Month.1","Year")
-ddf = ddf[-1,]
-
-library(kableExtra)
-library(gridExtra)
-ddf %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 1") %>% kable_paper("hover", full_width = F)
+interest.vars <- c("Activity", "Month", "Caloric", "Water.Excess", "Amoeba", "Land", "Water")
+descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
+descriptives.df <- descriptives.df[-c(3, 4, 7),]
+formattable(descriptives.df, align =c("l", rep("c", rep(6)), "r"), caption = "Descriptive Statistics for Quantitative Variables")
 ```
+
