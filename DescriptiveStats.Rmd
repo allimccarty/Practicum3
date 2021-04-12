@@ -3,8 +3,8 @@ title: "Descriptive Statistics"
 author: "Allison McCarty"
 date: "4/11/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -82,29 +82,42 @@ The data for the analysis were obtained by International Hugs for Otters (IHO). 
 
 ## Examining Missing Data
 
-From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water ** reword***
+From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  The rate of missing observations is high because two of the variables do not apply to some of the otter populations, therefore, those observations were noted as "N/A".  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water ** reword***
 
 
 IDEA: Imputation of Altitude to the median value for each of the sites
 
 ```{r}
 #Did I do this right?
-#plot = mice::md.pattern(otter_raw %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
-#View(plot)
+plot = mice::md.pattern(otter_raw %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
+View(plot)
 ```
 
-## Imputing Continous Variables
+## Imputing Continous Variable Representing Trout
 
 After determining that the four variables containing missing values (Altitude, Trout, Amoeba, Water) were all missing at random, we decided to address this issue by performing a single imputation of the median to replace the missing values.
 
-```{r}
-proportion_df = otter_raw %>%
-  group_by(Otter) %>%
-  summarize(n = n())
+NOTES: **ALLI CLEAN THIS UP**
 
-# We have 20 observations from each site
+The first variable with missing data is the variable representing a scaled measurement of lake trout population, which is a major food source for otters.  There were 16 observations with missing trout measurements.  For each of these, we performed a single imputation to replace the missing observation with the median trout value for the specific site. 
+
+```{r}
+sites <- c("Alpha", "Delta", "Gamma", "Omega", "Omicron")
+filter.otter  <- function(x) {filter(otter, Site == x)}
+site.df <- lapply(x=sites, filter.otter)
+medianTrout = median(otter$Trout, na.rm = TRUE)
+imputedData = raw_data %>%
+  mutate(
+    balance = replace_na(balance,medianBalance),
+    campaign = replace_na(campaign,medianCampaign),
+    age = replace_na(age,medianAge),
+    duration = replace_na(duration,medianDuration)
+  )
 ```
 
+## Interpolation of Altitude
+
+# Transformation of Ameoba and Water Variable
 
 ## Descriptive Statistics
 
