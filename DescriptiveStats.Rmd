@@ -21,6 +21,7 @@ library(tibble)
 library(GGally)
 library(kableExtra)
 library(ggpubr)
+library(zoo)
 
 
 # Read in Data
@@ -48,14 +49,7 @@ sum(is.na(otter$Year)) #NONE
 all.equal(is.na(otter$Water), is.na(otter$Amoeba)) # 80 element mismatches?
 
 #Some Cleaning
-otter_raw = read.csv("~/Downloads/otter2.csv") %>%
-  mutate(
-    Altitude = replace_na(Altitude,"Unknown"),
-    Trout = replace_na(Trout,"Unkown"),
-    Amoeba = replace_na(Amoeba,"Unkown"),
-    Water = replace_na(Water,"Unkown"),
-    numMissing = rowSums(across(everything(), ~is.na(.)))
-  )
+
 numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
 categoricalColumns = c(1, 5)
 df_colnames = colnames(otter_raw)
@@ -89,35 +83,43 @@ IDEA: Imputation of Altitude to the median value for each of the sites
 
 ```{r}
 #Did I do this right?
-plot = mice::md.pattern(otter_raw %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
+plot = mice::md.pattern(otter %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
 View(plot)
 ```
 
-## Imputing Continous Variable Representing Trout
+## Data Interpolation, Imputation, and Transformation for Missing Values
 
 After determining that the four variables containing missing values (Altitude, Trout, Amoeba, Water) were all missing at random, we decided to address this issue by performing a single imputation of the median to replace the missing values.
 
-NOTES: **ALLI CLEAN THIS UP**
+# Data Interpolation ofor Altitute and Trout
 
-The first variable with missing data is the variable representing a scaled measurement of lake trout population, which is a major food source for otters.  There were 16 observations with missing trout measurements.  For each of these, we performed a single imputation to replace the missing observation with the median trout value for the specific site. 
+The first variable with missing data is the variable representing a scaled measurement of lake trout population, which is a major food source for otters.  There were 16 observations with missing trout measurements.  For each of these, used a multiple imputation method to replace the missing observation with the mean trout value for the specific site. 
 
 ```{r}
+otter.compare <- otter
 sites <- c("Alpha", "Delta", "Gamma", "Omega", "Omicron")
-filter.otter  <- function(x) {filter(otter, Site == x)}
-site.df <- lapply(x=sites, filter.otter)
-medianTrout = median(otter$Trout, na.rm = TRUE)
-imputedData = raw_data %>%
-  mutate(
-    balance = replace_na(balance,medianBalance),
-    campaign = replace_na(campaign,medianCampaign),
-    age = replace_na(age,medianAge),
-    duration = replace_na(duration,medianDuration)
-  )
+otter$Trout<-ave(otter$Trout,otter$Site,FUN=function(x) 
+  ifelse(is.na(x), mean(x,na.rm=TRUE), x))
+
+otter <- otter %>%
+  group_by(Site) %>%
+  mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE))   
+
+otter <- otter %>%
+  group_by(Site) %>%
+  mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
 ```
 
-## Interpolation of Altitude
 
-# Transformation of Ameoba and Water Variable
+# Transformation  and Imputation of Ameoba and Water Variable
+```{r}
+otter$Amoeba <- otter$Amoeba +1
+otter = otter %>%
+  mutate(
+    Amoeba = replace_na(Amoeba,0),
+    Water = replace_na(Water,0)
+  )
+```
 
 ## Descriptive Statistics
 
