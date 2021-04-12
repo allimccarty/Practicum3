@@ -126,9 +126,15 @@ otter = otter %>%
 ## Descriptive Statistics
 
 ```{r}
-interest.vars <- c("Activity", "Month", "Caloric", "Water.Excess", "Amoeba", "Land", "Water")
+interest.vars <- c("Activity", "Caloric", "Water.Excess", "Amoeba", "Land", "Water")
 descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
 descriptives.df <- descriptives.df[-c(3, 4, 7),]
-formattable(descriptives.df, align =c("l", rep("c", rep(6)), "r"), caption = "Descriptive Statistics for Quantitative Variables")
+
+
+library(kableExtra)
+library(gridExtra)
+
+descriptives.df %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 1") %>% kable_paper("hover", full_width = F)
 ```
 
