@@ -3,8 +3,8 @@ title: "Descriptive Statistics"
 author: "Allison McCarty"
 date: "4/11/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -84,10 +84,8 @@ From the given data there are 100 observations. However there are 84 (84%) obser
 #View(plot)
 ```
 
-## Data Interpolation, Imputation, and Transformation for Missing Values
 
-
-#### Data Interpolation ofor Altitute and Trout
+#### Data Interpolation for Altitute and Trout
 
 The variables representing altitude and trout had 18 and 16 "N/A" observations, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Observations with "N/A" for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation.  
 
