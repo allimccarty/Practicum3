@@ -78,7 +78,8 @@ library(kableExtra)
 library(gridExtra)
 data_dict = read_excel("Data_dictionary.xlsx")
 data_dict %>%
-kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F)
+kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
+
 ```
 
 # The Data
@@ -149,11 +150,11 @@ interest.vars <- c("Activity", "Caloric", "Water.Excess", "Amoeba", "Land", "Wat
 descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
 descriptives.df <- descriptives.df[-c(3, 4, 7),]
 
-
 descriptives.df %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_paper("hover", full_width = F)
 ```
 
+\newpage
 
 # Specific Aims
 
