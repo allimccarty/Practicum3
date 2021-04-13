@@ -3,8 +3,8 @@ title: "Descriptive Statistics"
 author: "Allison McCarty"
 date: "4/11/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -83,8 +83,6 @@ From the given data there are 100 observations. However there are 84 (84%) obser
 #plot = mice::md.pattern(otter %>% select(3, 4, 11, 13),plot = TRUE,rotate.names = TRUE)
 #View(plot)
 ```
-
-## Data Interpolation, Imputation, and Transformation for Missing Values
 
 
 #### Data Interpolation ofor Altitute and Trout

@@ -1,0 +1,29 @@
+---
+title: "Data Description"
+author: "Allison McCarty"
+date: "4/12/2021"
+output: html_document
+---
+
+# The Data
+
+The data for the analysis were obtained by International Hugs for Otters (IHO).  The data was collected over the period from July 2018 to February 2020 on five  river  otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale in Lake Superior, north of the state of Michigan’s upper peninsula.  Each observation is aggregated to represent otter/region  characteristics  each  month.  The data contains 100 observations of 15 variables.  Additionally, the data is proprietary, and many of the variables have been standardized due to privacy concerns.  Description of all variables can be found in the data dictionary of the appendix.
+
+## Examining Missing Data
+
+The data obtained by IHO contains 100 observations on 15 variables. 
+
+From the data, 84 (84%) observations that contain one or more missing values for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water.  However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore marked as "N/A", causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will address observations that have missing values using different methodologies.
+
+#### Data Interpolation ofor Altitute and Trout
+
+The variables representing altitude and trout had 18 and 16 "N/A" observations, respectively. As the data is aggregated to represent scaled measurements over certain months, we want to address missing observations such that seasonal patterns and trends are observed. Therefore, we used an interpolation method to correct the missing data in the set for these two variables. Observations with "N/A" for either of these variables were replaced with the by taking the average value of the month prior and the month after for that specific variable. 
+  
+
+#### Transformation and Imputation of Ameoba and Water Variable
+
+The variables representing amoeba and water both had 40 "N/A" observations, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters. To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale was strictly positive (ranging from 0-2).  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced "N/A" values with 0 if those variables were not applicable to the site.
+
+The final data set contains 100 total observations with 0 missing values. From  this  data  set  we have compiled descriptive statistics into Table 1.
+
+
