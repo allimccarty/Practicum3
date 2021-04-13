@@ -68,9 +68,17 @@ transpose_df <- function(df) {
     tibble::as_tibble(.)
   return(t_df)
 }
+```
 
+
+```{r}
 #Data Dictionary
-
+library(readxl)
+library(kableExtra)
+library(gridExtra)
+data_dict = read_excel("Data_dictionary.xlsx")
+data_dict %>%
+kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F)
 ```
 
 # The Data
@@ -142,11 +150,8 @@ descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
 descriptives.df <- descriptives.df[-c(3, 4, 7),]
 
 
-library(kableExtra)
-library(gridExtra)
-
 descriptives.df %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 1") %>% kable_paper("hover", full_width = F)
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_paper("hover", full_width = F)
 ```
 
 
