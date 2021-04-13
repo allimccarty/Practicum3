@@ -2,14 +2,16 @@
 title: "SAP P3"
 author: "jmajoros"
 date: "4/12/2021"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Intoduction
 
 The Island of Isle Royale in Lake Superior is a United States National Park located north of the state of Michigan's Upper Peninsula. These islands are home to only 19 mammals (https://www.nps.gov/isro/learn/nature/index.htm). One notable species is the otter. While the population of North American river otters are deemed of Least Concern (Population Stable), it remains important to observe and understand the mammals to ensure their conservation. Our team has been tasked to analyze cyclical, environmental, and environmental elements that impact the otters' behaviors and activity. This analysis will aid in preserving the precious species in the islands, as to understand the otters is to in turn help them. 
 
-As we all know, climate change is a serious issue that has impacted the world and natural ecosystems heavily. A significant cause is human interference with ecosystems and natural resources. On the Island of Isle Royale, a luxury dog spa recently opened. Spas hold many issues of unstustainability, with environmental concerns from deforestation, plastic waste, and water contamination and consumption. Otters may be really sensitive to this recent introduction in their environment as fresh water has been drawn into the spa from local bodies of water. Our analysis will observe the effects of the introduction of the new luxury spa, and attempt to understand it's impact on the otters and surrounding ecosystem. 
+The climate change crisis has impacted the world and natural ecosystems heavily and threaten the well-being of species, including otters. A significant cause is human interference with ecosystems and natural resources. On the Island of Isle Royale, a luxury dog spa recently opened. Spas directly cause many issues relating to unstustainability, environmental concerns from deforestation, plastic waste, and water contamination and consumption. Otters could be negatively impacted to this recent intrusion in their environment, as fresh water has been drawn into the spa from local bodies of water. Our analysis will observe the effects of the introduction of the new luxury spa, and attempt to understand it's impact on the otters and surrounding ecosystem. 
 
 
 ```{r setup, include=FALSE}
@@ -104,12 +106,6 @@ The final data set contains 100 total observations of 17 variables with 0 missin
 #View(plot)
 ```
 
-## Data Interpolation, Imputation, and Transformation for Missing Values
-
-
-#### Data Interpolation ofor Altitute and Trout
-
-The variables representing altitude and trout had 18 and 16 "N/A" observations, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Observations with "N/A" for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation.  
 
 ```{r}
 otter <- otter %>%
@@ -121,11 +117,7 @@ otter <- otter %>%
   mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
 ```
 
-#### Transformation and Imputation of Ameoba and Water Variable
 
-The variables representing amoeba and water both had 40 "N/A" observations, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters.  
-
-Both variables for Ameoba and Water represent scaled measures rather than pure measurements.  The amoeba scale ranged from -1 to 1, while the water scale was strictly negative, with a minimal value of -27.4014.  To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale ranged from 0 to 2.  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced "N/A" values with 0 if those variables were not applicable to the site.
 
 ```{r}
 #Add dummy variable representing if the value was missing (1) or not (0)
