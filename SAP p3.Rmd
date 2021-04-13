@@ -9,11 +9,7 @@ output: pdf_document
 
 The Island of Isle Royale in Lake Superior is a United States National Park located north of the state of Michigan's Upper Peninsula. These islands are home to only 19 mammals (https://www.nps.gov/isro/learn/nature/index.htm). One notable species is the otter. While the population of North American river otters are deemed of Least Concern (Population Stable), it remains important to observe and understand the mammals to ensure their conservation. Our team has been tasked to analyze cyclical, environmental, and environmental elements that impact the otters' behaviors and activity. This analysis will aid in preserving the precious species in the islands, as to understand the otters is to in turn help them. 
 
-As we all know, climate change is a serious issue that has impacted the world and natural ecosystems heavily. Some causes 
-- otters are sensitive to the changes
-- luxury spa, does it influence the populations?
-- climate change
-- 
+As we all know, climate change is a serious issue that has impacted the world and natural ecosystems heavily. A significant cause is human interference with ecosystems and natural resources. On the Island of Isle Royale, a luxury dog spa recently opened. Spas hold many issues of unstustainability, with environmental concerns from deforestation, plastic waste, and water contamination and consumption. Otters may be really sensitive to this recent introduction in their environment as fresh water has been drawn into the spa from local bodies of water. Our analysis will observe the effects of the introduction of the new luxury spa, and attempt to understand it's impact on the otters and surrounding ecosystem. 
 
 
 ```{r setup, include=FALSE}
