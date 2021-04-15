@@ -1,0 +1,197 @@
+---
+title: "Analysis of Environmental and Man-Made Factors Affecting Otter Populations on Isle Royale"
+author: "Allison McCarty, Jordan Majoros, Shelley Rao"
+date: "4/20/2021"
+output: html_document
+---
+
+# Abstract (save for the end)
+
+- Describe otter population on Island of Isle Royale
+- Frame environmental concerns including the dog spa, and describe potential affect on otter
+- Our goal is to perform an anlaysis on trends of the environmental factors (briefly touch on specific aims)
+- Summarize results in 1-2 sentences
+
+
+# Intoduction (save final paragraph with results for the end)
+
+---- **This part was pulled directly from SAP, reword after SAP review
+The Island of Isle Royale in Lake Superior is a United States National Park located north of the state of Michigan's Upper Peninsula. These islands are home to only 19 mammals (https://www.nps.gov/isro/learn/nature/index.htm). One notable species is the otter. While the population of North American river otters are deemed of Least Concern (Population Stable), it remains important to observe and understand the mammals to ensure their conservation. Our team has been tasked to analyze cyclical, environmental, and environmental elements that impact the otters' behaviors and activity. This analysis will aid in preserving the precious species in the islands, as to understand the otters is to in turn help them. 
+
+The climate change crisis has impacted the world and natural ecosystems heavily and threaten the well-being of species, including otters. A significant cause is human interference with ecosystems and natural resources. On the Island of Isle Royale, a luxury dog spa recently opened. Spas directly cause many issues relating to unstustainability, environmental concerns from deforestation, plastic waste, and water contamination and consumption. Otters could be negatively impacted to this recent intrusion in their environment, as fresh water has been drawn into the spa from local bodies of water. Our analysis will observe the effects of the introduction of the new luxury spa, and attempt to understand it's impact on the otters and surrounding ecosystem. 
+--- **see above, edit after SAP review
+
+- Paragraph outlining specific aims and brief summary of results
+- Mention amoeba in the first part of the intro, as it is particularly relevant to SA2.
+
+We have outlined two specific aims for the purpose of this analysis:
+
+1. Determine the cyclic, seasonal, and/or environmental factors that impact each otter’sactivity level, taking into account the shared ecology, resources, and encounters.
+
+2. Determine the relationship between amount of amoeba and otter activity.
+
+3. Determine the Effect of the luxury dog spa
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
+library(readxl)
+library(tidyverse)
+library(dplyr)
+library(pastecs)
+library(data.table)
+library(formattable)
+library(tidyr)
+library(mice)
+library(tibble)
+library(GGally)
+library(kableExtra)
+library(ggpubr)
+library(zoo)
+library(gridExtra)
+
+
+# Read in Data
+otter <- read_csv("otter2.csv")
+
+
+#Some Cleaning
+numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
+categoricalColumns = c(1, 5)
+df_colnames = colnames(otter)
+
+transpose_df <- function(df) {
+  t_df <- data.table::transpose(df)
+  colnames(t_df) <- rownames(df)
+  rownames(t_df) <- colnames(df)
+  t_df <- t_df %>%
+    tibble::rownames_to_column(.data = .) %>%
+    tibble::as_tibble(.)
+  return(t_df)
+}
+```
+
+
+```{r}
+#Data Dictionary
+library(readxl)
+library(kableExtra)
+library(gridExtra)
+data_dict = read_excel("Data_dictionary.xlsx")
+data_dict %>%
+kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
+```
+
+# Data
+
+The original dataset collected by International Hugs for Otters (IHO) contained 100 observations of 15 variables, including two factored categorical variables, two variables representing latitude/longitude location coordinates, and eleven numerical variables.  The data was collected over the period from July 2018 to February 2020 on five river otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale inLake Superior, north of the state of Michigan’s upper peninsula. Each observation is aggregated to represent otter/region  characteristics  each  month.  There are a total of 20 observations for each of the 5 sites, representing a particilar variable for a given month in the 20-month study.  Description of all variables can be found in the data dictionary of the appendix.
+
+## Examining Missing Data
+
+From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water.  However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore marked as "N/A", causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
+
+
+```{r}
+library(naniar)
+otter.missing <- otter[,-c(7, 8, 15)]
+gg_miss_fct(x = otter.missing, fct = Month) + labs(title = "Missingness Pattern by Month")
+gg_miss_fct(x = otter.missing, fct = Otter) + labs(title = "Missingness Pattern by Otter")
+```
+
+**NOTE: should I only make this plot specific to the vars with missing values?
+
+#### Data Interpolation for Altitute and Trout
+
+The variables representing altitude and trout had 18 and 16 "N/A" observations, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Observations with "N/A" for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. 
+
+#### Transformation and Imputation of Ameoba and Water Variable
+
+The variables representing amoeba and water both had 40 "N/A" observations, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters.  
+
+Both variables for Ameoba and Water represent scaled measures rather than pure measurements.  The amoeba scale ranged from -1 to 1, while the water scale was strictly negative, with a minimal value of -27.4014.  To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale ranged from 0 to 2.  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced "N/A" values with 0 if those variables were not applicable to the site.
+
+```{r}
+otter <- otter %>%
+  group_by(Site) %>%
+  mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE))   
+
+otter <- otter %>%
+  group_by(Site) %>%
+  mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
+```
+
+
+```{r}
+#Add dummy variable representing if the value was missing (1) or not (0)
+otter$AmoebaNA <- ifelse(is.na(otter$Amoeba), 1, 0)
+otter$WaterNA <- ifelse(is.na(otter$Water), 1, 0)
+
+#Transformation on Amoeba
+otter$Amoeba <- otter$Amoeba +1
+
+# Imputation on Amoeba and Water
+otter = otter %>%
+  mutate(
+    Amoeba = replace_na(Amoeba,0),
+    Water = replace_na(Water,0)
+  )
+```
+
+ALLI: Include comparison to before and after for the data imputation
+
+Check Distribution and Normality Assumptions for all vars
+
+QQ-Plots for all continuous variables to be included in the appendix
+
+```{r}
+#First, we want to make qqnorm plots for all of the continuous variables, which will be used to justify transformations and included in the appendix
+library(car)
+otter.cont <- otter[numericColumns]
+otter.cont <- otter.cont[,-c(4, 10, 11)]
+cont.labels <- colnames(otter.cont)
+newfun <- function(x, y) qqPlot(x, main = paste(y, "QQ Plot", sep = " "))
+par(mfrow = c(2, 3))
+mapply(newfun, otter.cont, cont.labels)
+```
+
+We made QQPlots for all of the continuous numeric variables.  Based on the plots, we think that caloric intake, water excess, and altitude are approximately normal (at least normal enough that they do not merit transformations).
+
+Based on the QQPlots, variables representing activity, trout, amoeba, land, and water deviate from the normal distribution assumption. We will take a closer look at these variables and try a log transformation if necessary.
+
+
+```{r}
+otter.abnormal <- otter.cont[c(1, 3, 6:8)]
+library(reshape2)
+otter.abnormal<- melt(otter.abnormal)
+ggplot(data = otter.abnormal , aes(x = value)) + stat_density() + facet_wrap(~variable, scales = "free")
+#Trout, Activity, and Land have a strong right skew, whereas water has a left skew.  However, all water variables are negative, so I am not sure how to deal with them
+
+#Now, let's take a log transformation of all of these variables
+ggplot(data = otter.abnormal , aes(x = log(value))) + stat_density() + facet_wrap(~variable, scales = "free")
+```
+
+Pairs Plot : could be cleaned up a bit
+```{r}
+interestcols <- c(2, 9, 10:11, 16:17)
+ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Otter, alpha=.05)) 
+```
+
+
+Let's look at each of the otters through time
+```{r}
+#New data frames to select variables specific to each site
+RO599 <- filter(otter[c(1, numericColumns)], Otter=="RO-599")
+RO106 <- filter(otter[c(1, numericColumns)], Otter=="RO-106")
+RO255 <- filter(otter[c(1, numericColumns)], Otter=="RO-255")
+RO918 <- filter(otter[c(1, numericColumns)], Otter=="RO-918")
+RO859 <- filter(otter[c(1, numericColumns)], Otter=="RO-859")
+
+# Activity, Altitude, Trout, Caloric, Water
+
+p1 <- ggplot(data= otter, aes(y=Activity, x=Month, color=Site))+geom_smooth(se=FALSE)
+p2 <- ggplot(data= otter, aes(y=Altitude, x=Month, color=Site))+geom_smooth(se=FALSE)
+p3 <- ggplot(data= otter, aes(y=Trout, x=Month, color=Site))+geom_smooth(se=FALSE)
+p4 <- ggplot(data= otter, aes(y=Caloric, x=Month, color=Site))+geom_smooth(se=FALSE)
+p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Site))+geom_smooth(se=FALSE)
+p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Site))+geom_smooth(se=FALSE)
+ggarrange(p1, p2, p3, p4, p5, p6)
+```
