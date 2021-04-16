@@ -13,24 +13,19 @@ output: html_document
 - Summarize results in 1-2 sentences
 
 
-# Intoduction (save final paragraph with results for the end)
+# Intoduction (edits at the end to include results)
 
----- **This part was pulled directly from SAP, reword after SAP review
-The Island of Isle Royale in Lake Superior is a United States National Park located north of the state of Michigan's Upper Peninsula. These islands are home to only 19 mammals (https://www.nps.gov/isro/learn/nature/index.htm). One notable species is the otter. While the population of North American river otters are deemed of Least Concern (Population Stable), it remains important to observe and understand the mammals to ensure their conservation. Our team has been tasked to analyze cyclical, environmental, and environmental elements that impact the otters' behaviors and activity. This analysis will aid in preserving the precious species in the islands, as to understand the otters is to in turn help them. 
+Otters are a popular species that can be found on Michigan's Upper Peninsula in the island of Isle Royale in Lake Superior. In North America, otters are classified as a keystone species.  This distinction indicates that otters have a disproportionately large impact on their community. Because keystone species play a critical role in maintaining the structure and biodiversity within an ecosystem, it is crucial to understand the species and ensure their conservation. 
 
-The climate change crisis has impacted the world and natural ecosystems heavily and threaten the well-being of species, including otters. A significant cause is human interference with ecosystems and natural resources. On the Island of Isle Royale, a luxury dog spa recently opened. Spas directly cause many issues relating to unstustainability, environmental concerns from deforestation, plastic waste, and water contamination and consumption. Otters could be negatively impacted to this recent intrusion in their environment, as fresh water has been drawn into the spa from local bodies of water. Our analysis will observe the effects of the introduction of the new luxury spa, and attempt to understand it's impact on the otters and surrounding ecosystem. 
---- **see above, edit after SAP review
+Otters, like many other species on Isle Royale and worldwide, are vulnerable to the climate change crisis that has been unfolding for many decades.  Fortunately, the otter is not currently on The International Union for Conservation of Nature (IUCN) Red List for endangered species. However, the conservation of these animals is still an urgent issue, as hunting and other human disturbances have nearly driven otters to extinction many times throughout the last two centuries.  In addition, a luxury dog spa on Isle Royale recently opened on Isle Royale. The spa could potentially threaten the well-being of otters on the island, and poses significant environmental concerns relating to unsustainability, deforestation, waste management, water contamination, and energy consumption. The habitat intrusion of caused by the dog spa combine with already dire concerns related to the global climate crisis have created the urgent need to understand ecological factors that impact otters and their ability to survive and thrive on Isle Royale. Thus, International Hugs for Otters (IHO) has partnered with our firm to conduct an analysis on the cyclical, seasonal, and environmental factors that impact the otters' behaviors and activity, and the potential impact of the dog spa on these factors. IHO conducted a 20-month study on five otter rafts on Isle Royale. During the course of the investigation, **we will do something**.  This will include significant data processing and exploratory data analysis. We outlined three specific aims for the purpose of this analysis:
 
-- Paragraph outlining specific aims and brief summary of results
-- Mention amoeba in the first part of the intro, as it is particularly relevant to SA2.
+    1. Determine the cyclic, seasonal, and/or environmental factors that impact each otter’s activity level, taking into account the shared ecology, resources, and encounters.
 
-We have outlined two specific aims for the purpose of this analysis:
+    2. Determine the relationship between food sources and otter activity.
 
-1. Determine the cyclic, seasonal, and/or environmental factors that impact each otter’sactivity level, taking into account the shared ecology, resources, and encounters.
-
-2. Determine the relationship between amount of amoeba and otter activity.
-
-3. Determine the Effect of the luxury dog spa
+    3. Determine the effect of the luxury dog spa (?) add this after SAP review.
+    
+A brief paragraph about how we did this, as well as more detail about the plan in the above paragraph
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
@@ -71,43 +66,35 @@ transpose_df <- function(df) {
 ```
 
 
-```{r}
-#Data Dictionary
-library(readxl)
-library(kableExtra)
-library(gridExtra)
-data_dict = read_excel("Data_dictionary.xlsx")
-data_dict %>%
-kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
-```
-
 # Data
 
 The original dataset collected by International Hugs for Otters (IHO) contained 100 observations of 15 variables, including two factored categorical variables, two variables representing latitude/longitude location coordinates, and eleven numerical variables.  The data was collected over the period from July 2018 to February 2020 on five river otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale inLake Superior, north of the state of Michigan’s upper peninsula. Each observation is aggregated to represent otter/region  characteristics  each  month.  There are a total of 20 observations for each of the 5 sites, representing a particilar variable for a given month in the 20-month study.  Description of all variables can be found in the data dictionary of the appendix.
 
 ## Examining Missing Data
 
-From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water.  However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore marked as "N/A", causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
+From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water. However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore missing, causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
+
+- **ALLI ADD HERE: Paragraph explaining how we are investigating patterns of missingness**
 
 
 ```{r}
 library(naniar)
 otter.missing <- otter[,-c(7, 8, 15)]
-gg_miss_fct(x = otter.missing, fct = Month) + labs(title = "Missingness Pattern by Month")
-gg_miss_fct(x = otter.missing, fct = Otter) + labs(title = "Missingness Pattern by Otter")
+miss1<- gg_miss_fct(x = otter.missing, fct = Month) + labs(title = "Missingness Pattern by Month")
+miss2 <- gg_miss_fct(x = otter.missing, fct = Otter) + labs(title = "Missingness Pattern by Otter")
+ggarrange(miss1, miss2, ncol=1)
 ```
 
-**NOTE: should I only make this plot specific to the vars with missing values?
 
 #### Data Interpolation for Altitute and Trout
 
-The variables representing altitude and trout had 18 and 16 "N/A" observations, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Observations with "N/A" for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. 
+The variables representing altitude and trout had 18 and 16 missing values, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Missing values for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. 
 
 #### Transformation and Imputation of Ameoba and Water Variable
 
-The variables representing amoeba and water both had 40 "N/A" observations, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters.  
+The variables representing amoeba and water both had 40 missing values, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters.  
 
-Both variables for Ameoba and Water represent scaled measures rather than pure measurements.  The amoeba scale ranged from -1 to 1, while the water scale was strictly negative, with a minimal value of -27.4014.  To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale ranged from 0 to 2.  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced "N/A" values with 0 if those variables were not applicable to the site.
+Both variables for Ameoba and Water represent scaled measures rather than pure measurements.  The amoeba scale ranged from -1 to 1, while the water scale was strictly negative, with a minimal value of -27.4014.  To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale ranged from 0 to 2.  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced missing values with 0 if those variables were not applicable to the site. The final data set contains 100 total observations of 17 variables with 0 missing values. Descriptive statistics for the final dataset is included in Table X in the appendix.
 
 ```{r}
 otter <- otter %>%
@@ -136,24 +123,10 @@ otter = otter %>%
   )
 ```
 
-ALLI: Include comparison to before and after for the data imputation
 
-Check Distribution and Normality Assumptions for all vars
+# Exploratory Data Analysis
 
-QQ-Plots for all continuous variables to be included in the appendix
-
-```{r}
-#First, we want to make qqnorm plots for all of the continuous variables, which will be used to justify transformations and included in the appendix
-library(car)
-otter.cont <- otter[numericColumns]
-otter.cont <- otter.cont[,-c(4, 10, 11)]
-cont.labels <- colnames(otter.cont)
-newfun <- function(x, y) qqPlot(x, main = paste(y, "QQ Plot", sep = " "))
-par(mfrow = c(2, 3))
-mapply(newfun, otter.cont, cont.labels)
-```
-
-We made QQPlots for all of the continuous numeric variables.  Based on the plots, we think that caloric intake, water excess, and altitude are approximately normal (at least normal enough that they do not merit transformations).
+First, we will check the normality assumption and the distribution plots for all of the variables. We made QQPlots for all of the continuous numeric variables, which is included as Figure X in the appendix.  Based on the plots, we think that caloric intake, water excess, and altitude are approximately normal (at least normal enough that they do not merit transformations).
 
 Based on the QQPlots, variables representing activity, trout, amoeba, land, and water deviate from the normal distribution assumption. We will take a closer look at these variables and try a log transformation if necessary.
 
@@ -172,7 +145,7 @@ ggplot(data = otter.abnormal , aes(x = log(value))) + stat_density() + facet_wra
 Pairs Plot : could be cleaned up a bit
 ```{r}
 interestcols <- c(2, 9, 10:11, 16:17)
-ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Otter, alpha=.05)) 
+ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
 ```
 
 
@@ -195,3 +168,33 @@ p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Site))+geom_smooth(se=FALSE
 p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Site))+geom_smooth(se=FALSE)
 ggarrange(p1, p2, p3, p4, p5, p6)
 ```
+
+
+## Appendix
+
+```{r}
+#Data Dictionary
+library(readxl)
+library(kableExtra)
+library(gridExtra)
+data_dict = read_excel("Data_dictionary.xlsx")
+data_dict %>%
+kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
+
+#Descriptive Statistics
+interest.vars <- c("Activity", "Caloric", "Water Excess", "Amoeba", "Land", "Water")
+descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
+descriptives.df <- descriptives.df[-c(3, 4, 7),]
+descriptives.df %>% mutate_if(is.numeric, round, digits=2) %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_paper("hover", full_width = F)
+
+#QQNorm Plots
+library(car)
+otter.cont <- otter[numericColumns]
+otter.cont <- otter.cont[,-c(4, 10, 11)]
+cont.labels <- colnames(otter.cont)
+newfun <- function(x, y) qqPlot(x, main = paste(y, "QQ Plot", sep = " "))
+par(mfrow = c(2, 3))
+mapply(newfun, otter.cont, cont.labels)
+```
+
