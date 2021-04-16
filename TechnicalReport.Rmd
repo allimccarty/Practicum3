@@ -122,6 +122,9 @@ otter = otter %>%
     Amoeba = replace_na(Amoeba,0),
     Water = replace_na(Water,0)
   )
+
+#Extrapolation for Month 0 and 20
+otter$Trout.Interp[5] <- 174.80
 ```
 
 ## Before and After Data Transformation
