@@ -141,6 +141,7 @@ descriptives.df.after %>% mutate_if(is.numeric, round, digits=2) %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables after Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
+- t.test for difference in means to prove no quantitative difference
 - Anything more to do the comparison of before v after?
 
 # Exploratory Data Analysis
