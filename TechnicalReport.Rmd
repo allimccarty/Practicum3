@@ -48,8 +48,8 @@ library(gridExtra)
 
 # Read in Data
 otter <- read_csv("otter2.csv")
+otter.before <- otter
 
-otter.try <- otter
 #Some Cleaning
 numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
 categoricalColumns = c(1, 5)
@@ -71,7 +71,7 @@ transpose_df <- function(df) {
 
 The original dataset collected by International Hugs for Otters (IHO) contained 100 observations of 15 variables, including two factored categorical variables, two variables representing latitude/longitude location coordinates, and eleven numerical variables.  The data was collected over the period from July 2018 to February 2020 on five river otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale inLake Superior, north of the state of Michigan’s upper peninsula. Each observation is aggregated to represent otter/region  characteristics  each  month.  There are a total of 20 observations for each of the 5 sites, representing a particilar variable for a given month in the 20-month study.  Description of all variables can be found in the data dictionary of the appendix.
 
-## Examining Missing Data
+### Examining Missing Data
 
 From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water. However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore missing, causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
 
@@ -124,6 +124,24 @@ otter = otter %>%
   )
 ```
 
+## Before and After Data Transformation
+```{r}
+interest.vars <- c("Trout", "Altitude", "Amoeba", "Land")
+descriptives.df.before <- stat.desc(otter.before[(interest.vars)], basic = F)
+descriptives.df.before <- descriptives.df.before[-c(3, 4, 7),]
+
+interest.vars2 <- c("Trout.Interp", "Alt.Interp", "Amoeba", "Land")
+descriptives.df.after <- stat.desc(otter[(interest.vars2)], basic = F)
+descriptives.df.after <- descriptives.df.after[-c(3, 4, 7),]
+
+descriptives.df.before %>% mutate_if(is.numeric, round, digits=2) %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
+
+descriptives.df.after %>% mutate_if(is.numeric, round, digits=2) %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables after Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
+```
+
+- Anything more to do the comparison of before v after?
 
 # Exploratory Data Analysis
 
@@ -179,9 +197,7 @@ p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Site))+geom_smooth(se=FALSE
 p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Site))+geom_smooth(se=FALSE)
 ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
 
-p12 <- ggplot(data= otter.try, aes(y=Trout, x=Month, color=Site))+geom_smooth(se=FALSE)
-p11 <- ggplot(data= otter, aes(y=Trout.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
-ggarrange(p11, p12, common.legend = TRUE)
+
 ```
 
 
@@ -201,7 +217,7 @@ OtterNames <- c("RO106", "RO255", "RO599", "RO859", "RO918")
 TotalDistance <- c(total.RO106, total.RO255, total.RO599, total.RO859, total.RO918)
 Freq.Dist <- cbind(id=OtterNames, TotalDistance)
 
-Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered by Otter", label = "Table 2") %>% kable_paper("hover", full_width = F)
+Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered by Otter", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
 1.2.2 and 1.2.3 --> Ask about plan for mapping
@@ -240,14 +256,14 @@ library(kableExtra)
 library(gridExtra)
 data_dict = read_excel("Data_dictionary.xlsx")
 data_dict %>%
-kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
+kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_classic_2(full_width = F)
 
 #Descriptive Statistics
 interest.vars <- c("Activity", "Caloric", "Water Excess", "Amoeba", "Land", "Water")
 descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
 descriptives.df <- descriptives.df[-c(3, 4, 7),]
 descriptives.df %>% mutate_if(is.numeric, round, digits=2) %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_paper("hover", full_width = F)
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_classic_2(full_width = F)
 
 #QQNorm Plots
 library(car)
