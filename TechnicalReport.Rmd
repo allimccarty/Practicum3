@@ -100,11 +100,13 @@ Both variables for Ameoba and Water represent scaled measures rather than pure m
 ```{r}
 otter <- otter %>%
   group_by(Site) %>%
-  mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE))   
-
+  mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE, rule=2))
+# Make sure that they all were covered
+sum(is.na(otter$Alt.Interp))
 otter <- otter %>%
   group_by(Site) %>%
-  mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
+  mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE, rule=2))
+sum(is.na(otter$Trout.Interp))
 ```
 
 
@@ -122,20 +124,18 @@ otter = otter %>%
     Amoeba = replace_na(Amoeba,0),
     Water = replace_na(Water,0)
   )
-
-#Extrapolation for Month 0 and 20
-otter$Trout.Interp[5] <- 174.80
+gg_miss_fct(x = otter, fct = Month)
 ```
 
 ## Before and After Data Transformation
 ```{r}
 interest.vars <- c("Trout", "Altitude", "Amoeba", "Land")
 descriptives.df.before <- stat.desc(otter.before[(interest.vars)], basic = F)
-descriptives.df.before <- descriptives.df.before[-c(3, 4, 7),]
+descriptives.df.before <- descriptives.df.before[-c(1, 3, 4, 7),]
 
 interest.vars2 <- c("Trout.Interp", "Alt.Interp", "Amoeba", "Land")
 descriptives.df.after <- stat.desc(otter[(interest.vars2)], basic = F)
-descriptives.df.after <- descriptives.df.after[-c(3, 4, 7),]
+descriptives.df.after <- descriptives.df.after[-c(1, 3, 4, 7),]
 
 descriptives.df.before %>% mutate_if(is.numeric, round, digits=2) %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
@@ -144,8 +144,28 @@ descriptives.df.after %>% mutate_if(is.numeric, round, digits=2) %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables after Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
-- t.test for difference in means to prove no quantitative difference
-- Anything more to do the comparison of before v after?
+Overlaping Density Plots
+```{r}
+#Sample data
+Altitude <- c(otter$Altitude, otter$Alt.Interp)
+Trout <- c(otter$Trout, otter$Trout.Interp)
+Transform <- c(rep("Original", 100), rep("Transformed", 100))
+OverlapData <- data.frame(Altitude, Trout, Transform)
+#Plot
+o1 <- ggplot(OverlapData, aes(x = Altitude, fill = Transform)) + geom_density(alpha = 0.5)
+o2 <- ggplot(OverlapData, aes(x = Trout, fill = Transform)) + geom_density(alpha = 0.5)
+ggarrange(o1, o2, common.legend = TRUE)
+
+# t-test for difference in sample means
+t.test(otter$Altitude, otter$Alt.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
+t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
+```
+
+Alli for what is left on DATA:
+
+- Explain extrapolation in addition to interpolation
+- Explain what is shown in the overlapping density plots
+- Outline process for t.test to show that there is no difference in the means for the transformed variables
 
 # Exploratory Data Analysis
 
