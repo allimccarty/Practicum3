@@ -1,8 +1,11 @@
 ---
-title: "Analysis of Environmental and Man-Made Factors Affecting Otter Populations on Isle Royale"
+title: Analysis of Environmental and Man-Made Factors Affecting Otter Populations
+  on Isle Royale
 author: "Allison McCarty, Jordan Majoros, Shelley Rao"
 date: "4/20/2021"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 # Abstract (save for the end)
@@ -15,17 +18,15 @@ output: html_document
 
 # Intoduction (edits at the end to include results)
 
-Otters are a popular species that can be found on Michigan's Upper Peninsula in the island of Isle Royale in Lake Superior. In North America, otters are classified as a keystone species.  This distinction indicates that otters have a disproportionately large impact on their community. Because keystone species play a critical role in maintaining the structure and biodiversity within an ecosystem, it is crucial to understand the species and ensure their conservation. 
+Otters are a popular species that can be found on Michigan's Upper Peninsula in the island of Isle Royale in Lake Superior. In North America, otters are classified as a keystone species.  This distinction indicates that otters have a disproportionately large impact on their community. Because keystone species play a critical role in maintaining the structure and biodiversity within an ecosystem, it is crucial to understand this species and ensure their conservation. 
 
-Otters, like many other species on Isle Royale and worldwide, are vulnerable to the climate change crisis that has been unfolding for many decades.  Fortunately, the otter is not currently on The International Union for Conservation of Nature (IUCN) Red List for endangered species. However, the conservation of these animals is still an urgent issue, as hunting and other human disturbances have nearly driven otters to extinction many times throughout the last two centuries.  In addition, a luxury dog spa on Isle Royale recently opened on Isle Royale. The spa could potentially threaten the well-being of otters on the island, and poses significant environmental concerns relating to unsustainability, deforestation, waste management, water contamination, and energy consumption. The habitat intrusion of caused by the dog spa combine with already dire concerns related to the global climate crisis have created the urgent need to understand ecological factors that impact otters and their ability to survive and thrive on Isle Royale. Thus, International Hugs for Otters (IHO) has partnered with our firm to conduct an analysis on the cyclical, seasonal, and environmental factors that impact the otters' behaviors and activity, and the potential impact of the dog spa on these factors. IHO conducted a 20-month study on five otter rafts on Isle Royale. During the course of the investigation, **we will do something**.  This will include significant data processing and exploratory data analysis. We outlined three specific aims for the purpose of this analysis:
+Otters, like many other species on Isle Royale and worldwide, are vulnerable to the climate change crisis that has been unfolding for many decades.  Fortunately, the otter is not currently on The International Union for Conservation of Nature (IUCN) Red List for endangered species. However, the conservation of these animals is still an urgent issue, as hunting and other human disturbances have nearly driven otters to extinction many times throughout the last two centuries.  In addition, a luxury dog spa on Isle Royale recently opened on Isle Royale. The spa could potentially threaten the well-being of otters on the island, and poses significant environmental concerns relating to unsustainability, deforestation, waste management, water contamination, and energy consumption. The habitat intrusion of caused by the dog spa combine with already dire concerns related to the global climate crisis have created the urgent need to understand ecological factors that impact otters and their ability to survive and thrive on Isle Royale. Thus, International Hugs for Otters (IHO) has partnered with our firm to conduct an analysis on the cyclical, seasonal, and environmental factors that impact the otters' behaviors and activity, and the potential impact of the dog spa on these factors. IHO conducted a 20-month study on five otter rafts on Isle Royale. During the course of the investigation, perform a statistical analysis considering observed seasonal trends in the context of climate change and the recent opening of the luxury dog spa.  This analysis will include significant data processing and exploratory data analysis. We outlined two specific aims for the purpose of this analysis:
 
-    1. Determine the cyclic, seasonal, and/or environmental factors that impact each otter’s activity level, taking into account the shared ecology, resources, and encounters.
+   1. Determine the cyclic, seasonal, and/or environmental factors that impact each otter’s activity level, taking into account the shared ecology, resources, and encounters.
 
-    2. Determine the relationship between food sources and otter activity.
-
-    3. Determine the effect of the luxury dog spa (?) add this after SAP review.
+  2. Determine the relationship between food sources and otter activity.
     
-A brief paragraph about how we did this, as well as more detail about the plan in the above paragraph
+- A brief paragraph about how we did this, as well as more detail about the plan in the above paragraph
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
@@ -47,7 +48,7 @@ library(gridExtra)
 
 # Read in Data
 otter <- read_csv("otter2.csv")
-
+otter.before <- otter
 
 #Some Cleaning
 numericColumns = c(2, 3, 4, 6, 9, 10, 11, 12, 13, 14, 15)
@@ -70,7 +71,7 @@ transpose_df <- function(df) {
 
 The original dataset collected by International Hugs for Otters (IHO) contained 100 observations of 15 variables, including two factored categorical variables, two variables representing latitude/longitude location coordinates, and eleven numerical variables.  The data was collected over the period from July 2018 to February 2020 on five river otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale inLake Superior, north of the state of Michigan’s upper peninsula. Each observation is aggregated to represent otter/region  characteristics  each  month.  There are a total of 20 observations for each of the 5 sites, representing a particilar variable for a given month in the 20-month study.  Description of all variables can be found in the data dictionary of the appendix.
 
-## Examining Missing Data
+### Examining Missing Data
 
 From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water. However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore missing, causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
 
@@ -99,11 +100,13 @@ Both variables for Ameoba and Water represent scaled measures rather than pure m
 ```{r}
 otter <- otter %>%
   group_by(Site) %>%
-  mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE))   
-
+  mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE, rule=2))
+# Make sure that they all were covered
+sum(is.na(otter$Alt.Interp))
 otter <- otter %>%
   group_by(Site) %>%
-  mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE)) 
+  mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE, rule=2))
+sum(is.na(otter$Trout.Interp))
 ```
 
 
@@ -121,14 +124,64 @@ otter = otter %>%
     Amoeba = replace_na(Amoeba,0),
     Water = replace_na(Water,0)
   )
+gg_miss_fct(x = otter, fct = Month)
 ```
 
+## Before and After Data Transformation
+```{r}
+interest.vars <- c("Trout", "Altitude", "Amoeba", "Land")
+descriptives.df.before <- stat.desc(otter.before[(interest.vars)], basic = F)
+descriptives.df.before <- descriptives.df.before[-c(1, 3, 4, 7),]
+
+interest.vars2 <- c("Trout.Interp", "Alt.Interp", "Amoeba", "Land")
+descriptives.df.after <- stat.desc(otter[(interest.vars2)], basic = F)
+descriptives.df.after <- descriptives.df.after[-c(1, 3, 4, 7),]
+
+descriptives.df.before %>% mutate_if(is.numeric, round, digits=2) %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
+
+descriptives.df.after %>% mutate_if(is.numeric, round, digits=2) %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables after Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
+```
+
+Overlaping Density Plots
+```{r}
+#Sample data
+Altitude <- c(otter$Altitude, otter$Alt.Interp)
+Trout <- c(otter$Trout, otter$Trout.Interp)
+Transform <- c(rep("Original", 100), rep("Transformed", 100))
+OverlapData <- data.frame(Altitude, Trout, Transform)
+#Plot
+o1 <- ggplot(OverlapData, aes(x = Altitude, fill = Transform)) + geom_density(alpha = 0.5)
+o2 <- ggplot(OverlapData, aes(x = Trout, fill = Transform)) + geom_density(alpha = 0.5)
+ggarrange(o1, o2, common.legend = TRUE)
+
+# t-test for difference in sample means
+t.test(otter$Altitude, otter$Alt.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
+t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
+```
+
+Alli for what is left on DATA:
+
+- Explain extrapolation in addition to interpolation
+- Explain what is shown in the overlapping density plots
+- Outline process for t.test to show that there is no difference in the means for the transformed variables
 
 # Exploratory Data Analysis
 
 First, we will check the normality assumption and the distribution plots for all of the variables. We made QQPlots for all of the continuous numeric variables, which is included as Figure X in the appendix.  Based on the plots, we think that caloric intake, water excess, and altitude are approximately normal (at least normal enough that they do not merit transformations).
 
 Based on the QQPlots, variables representing activity, trout, amoeba, land, and water deviate from the normal distribution assumption. We will take a closer look at these variables and try a log transformation if necessary.
+```{r, include=FALSE}
+#QQNorm Plots
+library(car)
+otter.cont <- otter[numericColumns]
+otter.cont <- otter.cont[,-c(4, 10, 11)]
+cont.labels <- colnames(otter.cont)
+newfun <- function(x, y) qqPlot(x, main = paste(y, "QQ Plot", sep = " "))
+par(mfrow = c(2, 3))
+mapply(newfun, otter.cont, cont.labels)
+```
 
 
 ```{r}
@@ -161,14 +214,62 @@ RO859 <- filter(otter[c(1, numericColumns)], Otter=="RO-859")
 # Activity, Altitude, Trout, Caloric, Water
 
 p1 <- ggplot(data= otter, aes(y=Activity, x=Month, color=Site))+geom_smooth(se=FALSE)
-p2 <- ggplot(data= otter, aes(y=Altitude, x=Month, color=Site))+geom_smooth(se=FALSE)
-p3 <- ggplot(data= otter, aes(y=Trout, x=Month, color=Site))+geom_smooth(se=FALSE)
+p2 <- ggplot(data= otter, aes(y=Alt.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
+p3 <- ggplot(data= otter, aes(y=Trout.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
 p4 <- ggplot(data= otter, aes(y=Caloric, x=Month, color=Site))+geom_smooth(se=FALSE)
 p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Site))+geom_smooth(se=FALSE)
 p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Site))+geom_smooth(se=FALSE)
-ggarrange(p1, p2, p3, p4, p5, p6)
+ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
+
+
 ```
 
+
+
+Some EDA specific to Shelley's Specific Aims:
+
+1.1.2 Frequency Distribution of each otter and sum of total covered miles
+
+```{r}
+total.RO106 <- sum(RO106$Activity)
+total.RO255 <- sum(RO255$Activity)
+total.RO599 <- sum(RO599$Activity)
+total.RO859 <- sum(RO859$Activity)
+total.RO918 <- sum(RO918$Activity)
+
+OtterNames <- c("RO106", "RO255", "RO599", "RO859", "RO918")
+TotalDistance <- c(total.RO106, total.RO255, total.RO599, total.RO859, total.RO918)
+Freq.Dist <- cbind(id=OtterNames, TotalDistance)
+
+Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered by Otter", label = "Table 2") %>% kable_classic_2(full_width = F)
+```
+
+1.2.2 and 1.2.3 --> Ask about plan for mapping
+
+1.2.4 Scatterplot Showing the Relationship between Trout and Total Distance Covered
+```{r}
+ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE)
+```
+
+1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
+```{r}
+ggplot(otter, aes(x = Amoeba, y=Caloric, color=Otter))+geom_point()
+
+# summary(RO918$Amoeba) ; Maybe something important to note here is the the minimum for RO-918 is .01, NOT 0, so there is in fact a difference in the way that this is coded versus the sites where this variable is not applicable
+```
+
+1.2.6 Bar Graph Comparing Distance for locations with and without Mussels
+
+```{r}
+Mussel<- c("No", "No", "Yes", "Yes", "Yes")
+Freq.Dist2 <- data.frame(OtterNames, TotalDistance, Mussel)
+ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
+  geom_bar(stat="identity")
+```
+
+1.2.7 Plot Monthly distance covered by each otter
+
+- Already completed in the important vars v. Month section
 
 ## Appendix
 
@@ -179,14 +280,14 @@ library(kableExtra)
 library(gridExtra)
 data_dict = read_excel("Data_dictionary.xlsx")
 data_dict %>%
-kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
+kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_classic_2(full_width = F)
 
 #Descriptive Statistics
 interest.vars <- c("Activity", "Caloric", "Water Excess", "Amoeba", "Land", "Water")
 descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
 descriptives.df <- descriptives.df[-c(3, 4, 7),]
 descriptives.df %>% mutate_if(is.numeric, round, digits=2) %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_paper("hover", full_width = F)
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_classic_2(full_width = F)
 
 #QQNorm Plots
 library(car)
