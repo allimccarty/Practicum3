@@ -44,7 +44,8 @@ library(kableExtra)
 library(ggpubr)
 library(zoo)
 library(gridExtra)
-
+library(readxl)
+library(car)
 
 # Read in Data
 otter <- read_csv("otter2.csv")
@@ -87,7 +88,7 @@ ggarrange(miss1, miss2, ncol=1)
 ```
 
 
-#### Data Interpolation for Altitute and Trout
+#### Data Interpolation and Extrapolation for Altitute and Trout
 
 The variables representing altitude and trout had 18 and 16 missing values, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Missing values for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. 
 
@@ -124,7 +125,6 @@ otter = otter %>%
     Amoeba = replace_na(Amoeba,0),
     Water = replace_na(Water,0)
   )
-gg_miss_fct(x = otter, fct = Month)
 ```
 
 ## Before and After Data Transformation
@@ -144,7 +144,7 @@ descriptives.df.after %>% mutate_if(is.numeric, round, digits=2) %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables after Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
-Overlaping Density Plots
+Overlaping Density Plots for Original v. Interopolated/Extrapolated Variables
 ```{r}
 #Sample data
 Altitude <- c(otter$Altitude, otter$Alt.Interp)
@@ -155,14 +155,18 @@ OverlapData <- data.frame(Altitude, Trout, Transform)
 o1 <- ggplot(OverlapData, aes(x = Altitude, fill = Transform)) + geom_density(alpha = 0.5)
 o2 <- ggplot(OverlapData, aes(x = Trout, fill = Transform)) + geom_density(alpha = 0.5)
 ggarrange(o1, o2, common.legend = TRUE)
+```
 
+T-test for differences in Mean for Original v. Interopolated/Extrapolated Variables
+```{r, include=FALSE}
 # t-test for difference in sample means
 t.test(otter$Altitude, otter$Alt.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
 t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
 ```
 
-Alli for what is left on DATA:
+Alli for what is left on DATA (mostly explanations and text):
 
+- Explain logic behind missingness plot, takeaways
 - Explain extrapolation in addition to interpolation
 - Explain what is shown in the overlapping density plots
 - Outline process for t.test to show that there is no difference in the means for the transformed variables
@@ -275,9 +279,6 @@ ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
 
 ```{r}
 #Data Dictionary
-library(readxl)
-library(kableExtra)
-library(gridExtra)
 data_dict = read_excel("Data_dictionary.xlsx")
 data_dict %>%
 kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_classic_2(full_width = F)
@@ -290,7 +291,6 @@ descriptives.df %>% mutate_if(is.numeric, round, digits=2) %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_classic_2(full_width = F)
 
 #QQNorm Plots
-library(car)
 otter.cont <- otter[numericColumns]
 otter.cont <- otter.cont[,-c(4, 10, 11)]
 cont.labels <- colnames(otter.cont)
