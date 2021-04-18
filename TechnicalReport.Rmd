@@ -276,10 +276,15 @@ ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
 
 **explain why we want to look into amoeba**
 
+In order to fully understand the impact of the environment on the otters, we believed it best to analyze the food source that is amoeba. An important factor within the otter's well being is their food intake, and it important to understand the influence that this food source has on the otter activity level. We used month of collection, trout population, caloric expenditure, and time spent on land as explanatory variables examine the association with amoeba. 
+
 ```{r}
-head(otter)
-otter.lm = lm(Amoeba ~ Month + Trout.Interp + Caloric + Land, data = otter)
-AIC(otter.lm)
+#remove otters 106 and 255, 21:60 - just the ones with amoeba
+#check im using the right data set
+model.dat = otter[-c(21:60),]
+#do I use amount of amoeba as a dummy variable 
+otter.lm = lm(Amoeba ~ Month + Trout + Caloric + Land, data = model.dat)
+#AIC(otter.lm)
 # otter.glm = glm(Amoeba ~ Month + Trout.Interp + Caloric + Land, data = otter, family = gaussian)
 # AIC(otter.glm)
 ```
