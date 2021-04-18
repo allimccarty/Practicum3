@@ -108,11 +108,11 @@ otter <- otter %>%
   group_by(Site) %>%
   mutate(Alt.Interp = na.approx(Altitude, na.rm=FALSE, rule=2))
 # Make sure that they all were covered
-sum(is.na(otter$Alt.Interp))
+# sum(is.na(otter$Alt.Interp))
 otter <- otter %>%
   group_by(Site) %>%
   mutate(Trout.Interp = na.approx(Trout, na.rm=FALSE, rule=2))
-sum(is.na(otter$Trout.Interp))
+# sum(is.na(otter$Trout.Interp))
 ```
 
 
@@ -134,16 +134,14 @@ otter = otter %>%
 
 ```{r}
 interest.vars <- c("Trout", "Altitude")
-descriptives.df.before <- stat.desc(otter.before[(interest.vars)], basic = F)
-descriptives.df.before <- descriptives.df.before[-c(1, 3, 4, 7),]
-
 interest.vars2 <- c("Trout.Interp", "Alt.Interp")
-descriptives.df.after <- stat.desc(otter[(interest.vars2)], basic = F)
-descriptives.df.after <- descriptives.df.after[-c(1, 3, 4, 7),]
+after <- stat.desc(otter[(interest.vars2)], basic = F)
+before <- stat.desc(otter.before[(interest.vars)], basic = F)
 
-descriptices.total <- cbind(descriptives.df.before, descriptives.df.after)
+descriptives.total <- cbind(before, after)
+descriptives.total <- descriptives.total[-c(1, 3, 4, 7),]
 
-descriptices.total %>% mutate_if(is.numeric, round, digits=2) %>%
+descriptives.total %>% mutate_if(is.numeric, round, digits=2) %>%
 kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
