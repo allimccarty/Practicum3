@@ -1,15 +1,13 @@
 ---
-title: "SAP P3"
-author: "jmajoros"
+title: "Analysis of Environmental and Man Made Factors Affecting Otter Populations in Isle Royale"
+author: "Jordan Majoros, Alli McCarty, Shelley Rao"
 date: "4/12/2021"
-output:
-  html_document:
-    df_print: paged
+output: pdf_document
 ---
 
 # Intoduction
 
-The Island of Isle Royale in Lake Superior is a United States National Park located north of the state of Michigan's Upper Peninsula. These islands are home to only 19 mammals (https://www.nps.gov/isro/learn/nature/index.htm). One notable species is the otter. While the population of North American river otters are deemed of Least Concern (Population Stable), it remains important to observe and understand the mammals to ensure their conservation. Our team has been tasked to analyze cyclical, environmental, and environmental elements that impact the otters' behaviors and activity. This analysis will aid in preserving the precious species in the islands, as to understand the otters is to in turn help them. 
+The Island of Isle Royale in Lake Superior is a United States National Park located north of the state of Michigan's Upper Peninsula. These islands are home to only 19 mammals. One notable species is the otter. While the population of North American river otters are deemed of Least Concern (Population Stable), it remains important to observe and understand the mammals to ensure their conservation. Our team has been tasked to analyze cyclical, environmental, and environmental elements that impact the otters' behaviors and activity. This analysis will aid in preserving the precious species in the islands, as to understand the otters is to in turn help them. 
 
 The climate change crisis has impacted the world and natural ecosystems heavily and threaten the well-being of species, including otters. A significant cause is human interference with ecosystems and natural resources. On the Island of Isle Royale, a luxury dog spa recently opened. Spas directly cause many issues relating to unstustainability, environmental concerns from deforestation, plastic waste, and water contamination and consumption. Otters could be negatively impacted to this recent intrusion in their environment, as fresh water has been drawn into the spa from local bodies of water. Our analysis will observe the effects of the introduction of the new luxury spa, and attempt to understand it's impact on the otters and surrounding ecosystem. 
 
@@ -73,30 +71,35 @@ transpose_df <- function(df) {
 ```
 
 
-```{r}
-#Data Dictionary
-library(readxl)
-library(kableExtra)
-library(gridExtra)
-data_dict = read_excel("Data_dictionary.xlsx")
-data_dict %>%
-kbl(caption = "Data Dictionary", label = "Table 1") %>% kable_paper("hover", full_width = F) %>% kable_styling(full_width = TRUE)
 
-```
 
 # The Data
 
 The data for the analysis were obtained by International Hugs for Otters (IHO).  The data was collected over the period from July 2018 to February 2020 on five  river  otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale in Lake Superior, north of the state of Michigan’s upper peninsula.  Each observation is aggregated to represent otter/region  characteristics  each  month. Additionally, the data is proprietary, and many of the variables have been standardized due to privacy concerns.  Description of all variables can be found in the data dictionary of the appendix.
 
+![Locations of the Five Otters on Isle Royale](Locations_Labels.jpg)
+
 The data obtained by IHO contains 100 observations on 15 variables. The data contained two categorical variables representing site and otter. These are directly related, as data were only gathered on one otter species per site.  Additionally, there are 20 total observations per site, representing variables obtained in a particular month of the 20 month study. From the data, 84 (84%) observations that contain one or more missing values for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water.  However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore marked as "N/A", causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will address observations that have missing values using different methodologies.
 
-#### Examination of Missing Data
+#### Examination of Missing Data\
 
 The variables representing altitude and trout had 18 and 16 "N/A" observations, respectively. As the data is aggregated to represent scaled measurements over certain months, we wanted to address missing observations such that seasonal patterns and trends are observed. Therefore, we used an interpolation method to correct the missing data in the set for these two variables. Observations with "N/A" for either of these variables were replaced with the by taking the average value of the month prior and the month after for that specific variable. 
 
 The variables representing amoeba and water both had 40 "N/A" observations, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters. To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale was strictly positive (ranging from 0-2).  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced "N/A" values with 0 if those variables were not applicable to the site.
 
+#### Descriptive Statistics \
+
 The final data set contains 100 total observations of 17 variables with 0 missing values. From  this  data  set  we have compiled descriptive statistics into Table 1.
+
+
+```{r}
+interest.vars <- c("Activity", "Caloric", "Water.Excess", "Amoeba", "Land", "Water")
+descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
+descriptives.df <- descriptives.df[-c(3, 4, 7),]
+library(kableExtra)
+descriptives.df %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 1") %>% kable_paper("hover", full_width = F)%>% kable_styling(latex_options = "HOLD_position")
+```
 
 
 ```{r}
@@ -135,34 +138,60 @@ otter = otter %>%
   )
 ```
 
-## Descriptive Statistics
 
-```{r}
-interest.vars <- c("Activity", "Caloric", "Water.Excess", "Amoeba", "Land", "Water")
-descriptives.df <- stat.desc(otter[(interest.vars)], basic = F)
-descriptives.df <- descriptives.df[-c(3, 4, 7),]
-
-descriptives.df %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables", label = "Table 2") %>% kable_paper("hover", full_width = F)
-```
-
-\newpage
 
 # Specific Aims
 
-SA1: To understand otter activity under different factors and conditions \
-1.1: Gather descriptive statistics of all variables measuring cyclic, seasonal, and environmental factors, shared conditions, and outcome \
-1.2: Obtain 2- and 3- variable comparisons describing the associations between factors, conditions, and outcome (activity) \
-  1.2.1: Highlight potential group patterns of interest \
-  1.2.2: Identify cross sectional and longitudinal patterns \
-1.3: Evaluate data missingness as it relates to site location \
+**Specific Aim 1**: To determine the cyclic, seasonal, and/or environmental factors that impact each otter’s activity level, taking into account the shared ecology, resources, and encounters.
+
+  * 1.1 Gather descriptive statistics of all variables measuring cyclic, seasonal, and environmental factors, shared conditions, and activity level.
+
+  * 1.2 Obtain 1-, 2- and 3- variable analyses describing the associations between factors, conditions, and sum total distance covered.
+
+    * 1.2.1 Obtain frequency distribution for each otter and its sum total distance covered.
+
+    * 1.2.2 Map otter activity level at each site using longitude and lattitude coordinate of otter collection site.
+
+    * 1.2.3 Map the amount of trout at each site using longitude and lattitude coordinate of otter collection site.
+
+    * 1.2.4 Obtain a scatterplot showing relationship between amount of trout and sum total distance covered.
+
+    * 1.2.5 Obtain a scatterplot showing relationship between amount of amoeba and caloric expenditure for site locations with mussel presence.
+
+    * 1.2.6 Obtain bar graph comparing amount of activity for otters at site locations with and without mussel presence.
+
+    * 1.2.7 Plot monthly distance covered for each otter.
+
+  * 1.3 Linear mixed model for combined otter activity data, with model accounting for variation across individual otter where otter identity is the random effect. The explanatory variables are Month of Collection, Trout Population, Presence of Amoeba (Yes/No), and Caloric Expenditure. The outcome variable is Activity level.
+
+    * 1.3.1 Obtain predicted random and fixed effects.
+
+    * 1.3.2 Calculate 95% confidence intervals for otter identity as the random effect. 
+
+    * 1.3.3 Perform diagnostic analysis to check assumptions of linear mixed model using QQ-plot and residual fitted plot. Potential outliers or influential points will be examined.
 
 
-SA2: To determine the factors that impact each otter’s activity level, taking into account the shared ecology, resources, and encounters. \
-2.1 Use hierarchical models to do longitudinal modeling of change in otter activity level from the period July 2018 through February 2020 \
-    2.1.1 Fit basic linear model for activity level \
-    2.1.2 Random intercept model for individual otter differences \
-    2.1.3 Individual trajectory model with random slope for time \
-    2.1.4 Curvilinear trajectory model with random nonlinear time \
-    2.1.5 Individual trajectory model with fixed effects for otter type and different location \
-2.2 OLS modeling activity before and after the opening of dog spa \
+**Specific Aim 2**: To determine the relationship between amount of amoeba and otter activity.
+
+  * 2.1 For the three site locations with presence of mussels, examine the association between amount of amoeba and combined otter activity using an OLS regression model. The explanatory variables are Month of Collection, Trout Population, Caloric Expenditure, Time Spent on Land, and Amount of Amoeba. The outcome variable is Activity level.
+
+    * 2.1.1 Perform diagnostic analysis to check the assumptions of constant variance and normality using residual plots, QQ-plots or relevant tests. Potential outliers or influential points will be examined.
+
+  * 2.2 Compare otter activity between site locations with and without amoeba, using two OLS models. The explanatory variables are Month of Collection, Trout Population, Time Spent on Land, and Caloric Expenditure. The outcome variable is Activity level.
+
+    * 2.2.1  Perform diagnostic analysis to check the assumptions of constant variance and normality using residual plots, QQ-plots or relevant tests. Potential outliers or influential points will be examined.
+
+
+
+\section{Appendix}
+\centering
+
+```{r, title = "Appendix", position = "center"}
+#Data Dictionary
+library(readxl)
+library(kableExtra)
+library(gridExtra)
+data_dict = read_excel("Data_dictionary.xlsx")
+data_dict %>%
+kbl(caption = "Data Dictionary", label = "Appendix 1") %>% kable_styling(full_width = TRUE) %>% kable_styling(latex_options = "HOLD_position")
+```
