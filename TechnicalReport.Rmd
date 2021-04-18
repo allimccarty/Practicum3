@@ -16,7 +16,7 @@ output:
 - Summarize results in 1-2 sentences
 
 
-# Intoduction (edits at the end to include results)
+# Introduction (edits at the end to include results)
 
 Otters are a popular species that can be found on Michigan's Upper Peninsula in the island of Isle Royale in Lake Superior. In North America, otters are classified as a keystone species.  This distinction indicates that otters have a disproportionately large impact on their community. Because keystone species play a critical role in maintaining the structure and biodiversity within an ecosystem, it is crucial to understand this species and ensure their conservation. 
 
@@ -270,6 +270,29 @@ ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
 1.2.7 Plot Monthly distance covered by each otter
 
 - Already completed in the important vars v. Month section
+
+
+2.1 For the three site locations with presence of mussels, examine the association between amount of amoeba and combined otter activity using an OLS regression model. The explanatory variables are Month of Collection, Trout Population, Caloric Expenditure, Time Spent on Land, and Amount of Amoeba. The outcome variable is Activity level.
+
+**explain why we want to look into amoeba**
+
+```{r}
+head(otter)
+otter.lm = lm(Amoeba ~ Month + Trout.Interp + Caloric + Land, data = otter)
+AIC(otter.lm)
+# otter.glm = glm(Amoeba ~ Month + Trout.Interp + Caloric + Land, data = otter, family = gaussian)
+# AIC(otter.glm)
+```
+
+2.1.1 Perform diagnostic analysis to check the assumptions of constant variance and normality using residual plots, QQ-plots or relevant tests. Potential outliers or influential points will be examined.
+
+```{r}
+newtable <- summary(otter.lm)$coefficients
+kable(newtable, digits=5)
+
+par(mfrow = c(2, 2))
+plot(otter.lm)
+```
 
 ## Appendix
 
