@@ -70,13 +70,15 @@ transpose_df <- function(df) {
 
 # Data
 
-The original dataset collected by International Hugs for Otters (IHO) contained 100 observations of 15 variables, including two factored categorical variables, two variables representing latitude/longitude location coordinates, and eleven numerical variables.  The data was collected over the period from July 2018 to February 2020 on five river otters  (RO-599,  RO-106, RO-255, RO-918, RO-859) located in five distinct regions on the Island of Isle Royale inLake Superior, north of the state of Michigan’s upper peninsula. Each observation is aggregated to represent otter/region  characteristics  each  month.  There are a total of 20 observations for each of the 5 sites, representing a particilar variable for a given month in the 20-month study.  Description of all variables can be found in the data dictionary of the appendix.
+The original dataset collected by International Hugs for Otters (IHO) contained 100 observations of 15 variables, including two factored categorical variables, two variables representing latitude/longitude location coordinates, and eleven numerical variables.  The data were collected over the period from July 2018 to February 2020 on five river otters (RO-599, RO-106, RO-255, RO-918, RO-859) located at five distinct sites on the Island of Isle Royale in Lake Superior, north of the state of Michigan’s upper peninsula. Each observation is aggregated to represent otter characteristics each month.  There are a total of 20 observations for each of the 5 sites, where each observation represents a particular variable for a given month in the 20-month study.  A description of all variables can be found in the data dictionary of the appendix.
 
 ### Examining Missing Data
 
-From the given data there are 100 observations. However there are 84 (84%) observations that contain one or more missing values.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  Altitude, Trout, Amoeba, Water. However, two of the variables with missing observations, Amoeba and Water, are not applicable to some sites, and are therefore missing, causing an artifically high censorship rate.  Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for Altitude and Trout. 
+From the given data there are 100 observations. However, there are 84 (84%) observations that contain one or more missing value.  Of the observations that contain missing values, the missing values were observed for one or multiple of the following variables:  altitude, trout, amoeba, water. However, two of the variables with missing observations, amoeba and water, are not applicable to some sites, and are therefore missing for all observations at some sites, causing an artificially high censorship rate.  
 
-- **ALLI ADD HERE: Paragraph explaining how we are investigating patterns of missingness**
+The amoeba variable represents a scaled measure of the presence of green mussel amoeba in green mussels, which is an important food source for some otters.  However, green mussels are not present in two of the five regions of the study and are therefore not applicable to two of the observed otter populations (RO-255 and RO-106).  The water variable represents a scaled measure of inland water availability.  This metric is not applicable to costal otters and therefore not observed in two of the otter populations in this study (RO-599 and RO-859).  
+
+To investigate the missingness pattern of the data, we constructed a missingness plot in Figure X.  The plot maps missingness by month and otter raft, where the color of the graph is scaled to represent the frequency of missingness.  As mentioned, the amoeba and water variables are not applicable to all otter types, so we expect to see a distinct missingness pattern. Missingness of these variables is dependent on otter type, as demonstrated by the yellow bars in the bottom panel of Figure X.  On the other hand, missingness in variables representing altitude and trout are relatively infrequent in all otter rafts and at all time points, which suggests that data for these two variables are missing at random. Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for altitude and trout.
 
 
 ```{r}
@@ -87,16 +89,19 @@ miss2 <- gg_miss_fct(x = otter.missing, fct = Otter) + labs(title = "Missingness
 ggarrange(miss1, miss2, ncol=1)
 ```
 
+#### Transformation and Imputation of Amoeba and Water Variable
 
-#### Data Interpolation and Extrapolation for Altitute and Trout
+Amoeba and water were not applicable to two of the five sites, meaning that these variables had 40 missing values each. Both variables for amoeba and water represent scaled measures rather than pure measurements.  The amoeba scale ranged from -1 to 1, while the water scale was strictly negative, with a minimal value of -27.4014.  To distinguish whether these variables were relevant to a particular site, we created new dummy variables with binary values (Yes/No) to represent if the value for amoeba or water was missing from the original dataset. Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale was strictly positive on a range from 0 to 2.  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced missing values with 0 if those variables were not applicable to the site. 
 
-The variables representing altitude and trout had 18 and 16 missing values, respectively. These variables represent the average change in altitude and amount of trout present over the month of observation.  Due to the time series nature of the data, we used an interpolation method to correct the missing data in the set.  Missing values for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. 
 
-#### Transformation and Imputation of Ameoba and Water Variable
+#### Data Interpolation and Extrapolation for Altitude and Trout 
 
-The variables representing amoeba and water both had 40 missing values, meaning that these variables were not applicable to two of the five sites each.  The amoeba variable, which represents green mussel amoeba in the green mussels, was not applicable to the Gamma and Delta site, due to lack of green mussels in these regions.  The water variable was not applicable to the Omega or Alpha site due to the fact that otters in these sites are coastal otters.  
+The variables representing altitude and trout had 18 and 16 missing values, respectively. We determined above that these values were missing at random.  These variables represent the average change in altitude and amount of trout present over the month of observation.  As the data is aggregated to represent scaled measurements over certain months, we wanted to address missing observations such that seasonal patterns and trends are observed. Therefore, we used an interpolation method to correct the missing data in the set for these two variables.  Using the interpolation method, missing values for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. However, the interpolation method does not work for observations in the first of last month of the study, as average values cannot be found without having information on both the moth prior and the month after a specific observation.  For missing values in either the first or last month, an extrapolation method was used instead.  Using the extrapolation method, missing values in the first month of the study were replaced with the value of that observation in the second month, whereas missing values in the last month (Month 20) were replaced with the value of that observation in the second-to-last month (Month 19).
 
-Both variables for Ameoba and Water represent scaled measures rather than pure measurements.  The amoeba scale ranged from -1 to 1, while the water scale was strictly negative, with a minimal value of -27.4014.  To adjust for missingness in these variables, we created new dummy variables with binary values to represent if the value for amoeba or water was missing (1) for that specific observation or not (0).  Next, we performed a linear transformation of +1 to the amoeba variable such that the adjusted scale ranged from 0 to 2.  Finally, we performed a single variable imputation for the amoeba and water variables, where we replaced missing values with 0 if those variables were not applicable to the site. The final data set contains 100 total observations of 17 variables with 0 missing values. Descriptive statistics for the final dataset is included in Table X in the appendix.
+Figure X shows overlapping density plots for trout and altitude variables before and after the interpolation and extrapolation methods were applied to replace missing values.  The plots show significant overlaps with minor shifts in the density distribution after missing data was filled in.  Descriptive statistics for altitude and trout before and after data processing are also included in Table X.  There are some discrepancies in mean, standard deviation, and variances of the distributions.  To confirm that these discrepancies were not significant, we performed a two-sample t-test for differences in the mean for both altitude and trout before and after data processing.  We obtained p-values of 0.9663 and 0.7021 for the comparison of before and after data processing in these variables, respectively, confirming that the data processing did not cause a significant change in the distribution about the mean.
+
+The final data set contains 100 total observations of 17 variables with 0 missing values. Descriptive statistics for the final dataset are included in Table X in the appendix.
+
 
 ```{r}
 otter <- otter %>%
@@ -127,24 +132,22 @@ otter = otter %>%
   )
 ```
 
-## Before and After Data Transformation
 ```{r}
-interest.vars <- c("Trout", "Altitude", "Amoeba", "Land")
+interest.vars <- c("Trout", "Altitude")
 descriptives.df.before <- stat.desc(otter.before[(interest.vars)], basic = F)
 descriptives.df.before <- descriptives.df.before[-c(1, 3, 4, 7),]
 
-interest.vars2 <- c("Trout.Interp", "Alt.Interp", "Amoeba", "Land")
+interest.vars2 <- c("Trout.Interp", "Alt.Interp")
 descriptives.df.after <- stat.desc(otter[(interest.vars2)], basic = F)
 descriptives.df.after <- descriptives.df.after[-c(1, 3, 4, 7),]
 
-descriptives.df.before %>% mutate_if(is.numeric, round, digits=2) %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
+descriptices.total <- cbind(descriptives.df.before, descriptives.df.after)
 
-descriptives.df.after %>% mutate_if(is.numeric, round, digits=2) %>%
-kbl(caption = "Descriptive Statistics for Quantitative Variables after Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
+descriptices.total %>% mutate_if(is.numeric, round, digits=2) %>%
+kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Processing", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
-Overlaping Density Plots for Original v. Interopolated/Extrapolated Variables
+
 ```{r}
 #Sample data
 Altitude <- c(otter$Altitude, otter$Alt.Interp)
@@ -157,19 +160,14 @@ o2 <- ggplot(OverlapData, aes(x = Trout, fill = Transform)) + geom_density(alpha
 ggarrange(o1, o2, common.legend = TRUE)
 ```
 
-T-test for differences in Mean for Original v. Interopolated/Extrapolated Variables
+
 ```{r, include=FALSE}
 # t-test for difference in sample means
 t.test(otter$Altitude, otter$Alt.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
 t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
 ```
 
-Alli for what is left on DATA (mostly explanations and text):
 
-- Explain logic behind missingness plot, takeaways
-- Explain extrapolation in addition to interpolation
-- Explain what is shown in the overlapping density plots
-- Outline process for t.test to show that there is no difference in the means for the transformed variables
 
 # Exploratory Data Analysis
 
