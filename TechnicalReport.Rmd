@@ -81,7 +81,7 @@ The amoeba variable represents a scaled measure of the presence of green mussel 
 To investigate the missingness pattern of the data, we constructed a missingness plot in Figure X.  The plot maps missingness by month and otter raft, where the color of the graph is scaled to represent the frequency of missingness.  As mentioned, the amoeba and water variables are not applicable to all otter types, so we expect to see a distinct missingness pattern. Missingness of these variables is dependent on otter type, as demonstrated by the yellow bars in the bottom panel of Figure X.  On the other hand, missingness in variables representing altitude and trout are relatively infrequent in all otter rafts and at all time points, which suggests that data for these two variables are missing at random. Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for altitude and trout.
 
 
-```{r}
+```{r, fig.align='center', fig.cap="Missingness Plot of Variables by Month and Otter"}
 library(naniar)
 otter.missing <- otter[,-c(7, 8, 15)]
 miss1<- gg_miss_fct(x = otter.missing, fct = Month) + labs(title = "Missingness Pattern by Month")
@@ -146,7 +146,7 @@ kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Pro
 ```
 
 
-```{r}
+```{r, fig.align='center', fig.cap="Density Distributions for Altitude and Trout Before and After Data Transformation"}
 #Sample data
 Altitude <- c(otter$Altitude, otter$Alt.Interp)
 Trout <- c(otter$Trout, otter$Trout.Interp)
@@ -184,26 +184,34 @@ mapply(newfun, otter.cont, cont.labels)
 ```
 
 
-```{r}
-otter.abnormal <- otter.cont[c(1, 3, 6:8)]
+We do not expect that Water and Amoeba will be normal based on the way that we filled in the missing data.  Based on the plot, most are normal.  
+
+```{r , fig.align='center', fig.cap="Density Distributions for Continuous Variables"}
+otter.abnormal <- otter.cont[c(1, 3, 7)]
 library(reshape2)
 otter.abnormal<- melt(otter.abnormal)
 ggplot(data = otter.abnormal , aes(x = value)) + stat_density() + facet_wrap(~variable, scales = "free")
-#Trout, Activity, and Land have a strong right skew, whereas water has a left skew.  However, all water variables are negative, so I am not sure how to deal with them
+# We could take a closer look at Activity, Trout, and Land.
 
-#Now, let's take a log transformation of all of these variables
+#Now, let's take a transformation of all of these variables
 ggplot(data = otter.abnormal , aes(x = log(value))) + stat_density() + facet_wrap(~variable, scales = "free")
+ggplot(data = otter.abnormal , aes(x = sqrt(value))) + stat_density() + facet_wrap(~variable, scales = "free")
+ggplot(data = otter.abnormal , aes(x = (value)^(1/3))) + stat_density() + facet_wrap(~variable, scales = "free")
+
+# do not include all of these graphs, only the transofrmations that we actually perform, all on one plot
 ```
 
+- Add explanation here about which transformation we choose for the vars (could choose any of the three for any var, does not have to be the same transformation, obviously), and actually perform the transformation to the data in the dataset
+
 Pairs Plot : could be cleaned up a bit
-```{r}
-interestcols <- c(2, 9, 10:11, 16:17)
+```{r, fig.align='center', fig.cap="Association Matrix for the Collinearity of Continuous Variables"}
+interestcols <- c(2, 9, 12, 17)
 ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
 ```
 
 
 Let's look at each of the otters through time
-```{r}
+```{r, fig.align='center', fig.cap="Patterns of Variables Through Time"}
 #New data frames to select variables specific to each site
 RO599 <- filter(otter[c(1, numericColumns)], Otter=="RO-599")
 RO106 <- filter(otter[c(1, numericColumns)], Otter=="RO-106")
