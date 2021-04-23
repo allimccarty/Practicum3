@@ -3,9 +3,7 @@ title: Analysis of Environmental and Man-Made Factors Affecting Otter Population
   on Isle Royale
 author: "Allison McCarty, Jordan Majoros, Shelley Rao"
 date: "4/20/2021"
-output:
-  html_document: default
-  pdf_document: default
+output: pdf_document
 ---
 
 # Abstract (save for the end)
@@ -172,6 +170,7 @@ t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, altern
 First, we will check the normality assumption and the distribution plots for all of the variables. We made QQPlots for all of the continuous numeric variables, which is included as Figure X in the appendix.  Based on the plots, we think that caloric intake, water excess, and altitude are approximately normal (at least normal enough that they do not merit transformations).
 
 Based on the QQPlots, variables representing activity, trout, amoeba, land, and water deviate from the normal distribution assumption. We will take a closer look at these variables and try a log transformation if necessary.
+
 ```{r, include=FALSE}
 #QQNorm Plots
 library(car)
@@ -207,12 +206,13 @@ ggplot(data=otter, aes(x=(Activity)^1/2))+ stat_density()
 
 - Add explanation here about which transformation we choose for the vars (could choose any of the three for any var, does not have to be the same transformation, obviously), and actually perform the transformation to the data in the dataset
 
-Pairs Plot : could be cleaned up a bit
+Pairs Plot
 ```{r, fig.align='center', fig.cap="Association Matrix for the Collinearity of Continuous Variables"}
 interestcols <- c(2, 9, 12, 17)
 ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
 ```
 
+In the pairs plot, we notice the relationships among each of the continuous variables. Caloric and Land have the strongest relationships, with a negative linear trend and strong correlation. Otherwise, the data appears to not have specific trends among the otters for the other variables, with weaker correlations and no evidence of linear trends. 
 
 Let's look at each of the otters through time
 ```{r, fig.align='center', fig.cap="Patterns of Variables Through Time"}
@@ -236,9 +236,7 @@ ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
 
 ```
 
-
-
-Some EDA specific to Shelley's Specific Aims:
+As we observe each of the otter's patterns for each variable over time, it is important to note an interesting change at month 10. As seen in the trends with Activity, Trout, and Amoeba, there is a difference in trend which could signify the opening of the dog spa on the island. When the dog spa opened, it would influence the environment around it, potentially harming the otter's food source. Otter Alpha? had a decrease in Amoeba, which signifies a decrease in their food source of mussels around that 10 month mark. On the other hand, Otter Alpha? also increased Activity around the same time, which could signify that it is working harder to find food and exerting more energy. 
 
 1.1.2 Frequency Distribution of each otter and sum of total covered miles
 
@@ -263,12 +261,16 @@ Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered 
 ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE)
 ```
 
+Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered. We observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1777), as compared to other islands (up to 800). Moreover, there is a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. 
+
 1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
 ```{r}
 ggplot(otter, aes(x = Amoeba, y=Caloric, color=Otter))+geom_point()
 
 # summary(RO918$Amoeba) ; Maybe something important to note here is the the minimum for RO-918 is .01, NOT 0, so there is in fact a difference in the way that this is coded versus the sites where this variable is not applicable
 ```
+
+Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. We observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean levels of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba. The plot shows that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
 
 1.2.6 Bar Graph Comparing Distance for locations with and without Mussels
 
@@ -279,9 +281,17 @@ ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
   geom_bar(stat="identity")
 ```
 
+Next, we create a bar graph to examine the total distance covered each otter. We observe that RO-599 and RO-106 have the greatest total distance covered by otter (about 12,400 and 8,000 respectively). Interestingly, the presence of mussels does not appear to have any association with total distance covered.
+
 1.2.7 Plot Monthly distance covered by each otter
 
 - Already completed in the important vars v. Month section
+
+Linear mixed models are an extension of simple linear models to allow both fixed and random effects, where non-independence exists in the data. A fixed effect is an unknown constant that we try to estimate from the data. A random effect is a random variable-- here, we are less interested in estimating the random effect and more so, the parameters that describe the distribution of the random effect. Using a random effects approach allows us to try to use our analysis to describe the larger population of otters beyond our sample of five otters. 
+
+To study cyclical, seasonal, and environmental factors associated with otter activity, we used a linear mixed-effects model that was created using all combined otter data. The model accounted for variation across individual otter with a random effect for otter identity; the data is grouped by otter and the random effect is constant within each group. The linear model shows that Month and Trout are significant, where every additional month is associated with 9.18 decrease in activity and every additional unit trout is associated .67 increase in activity. 
+
+The mixed model shows that every additional month is associated with .82 units decrease in activity and every additional unit trout is associated with 0.43 increase in activity. The mean number activity level for all otters is 147.44. From the maximum likelihood estimated computed, we see that the between-subjects SD is 208.67. The 95% confidence intervals plot for random effects shows that no interval lies on 0, which means that random effects meaningful in both directions. For Otter 599 and 106, the random effects is positive and for Otter 918, 859, and 255, the effect is negative. 
 
 ```{r}
 # fixed effects one-way ANOVA
@@ -315,7 +325,7 @@ abline(h=0)
 
 In order to fully understand the impact of the environment on the otters, we believed it best to analyze the food source that is amoeba. An important factor within the otter's well being is their food intake, and it important to understand the influence that this food source has on the otter activity level. We used month of collection, trout population, caloric expenditure, and time spent on land as explanatory variables examine the association with amoeba. 
 
-**CV for multiple models - explain what I did and why**
+To best understand the relationship between the amoeba and activity, we created a model that included month, trout, and amoeba as the predictors with activity as the response. We chose month and trout through a model selection process that went through each combination of the variables month, trout, caloric, and land to choose the best combination. 
 
 ```{r}
 #remove otters 106 and 255, 21:60 - just the ones with amoeba
@@ -326,7 +336,7 @@ training = model.dat[trainIndexes,]
 testing = model.dat[-trainIndexes,]
 
 set.seed(123)
-formulas <- gen_formula <- function(picks,curfeatures = c("Month","Trout.Interp","Caloric","Land", "AmoebaNA")) {
+formulas <- gen_formula <- function(picks,curfeatures = c("Month","Trout.Interp","Caloric","Land", "Amoeba")) {
   str_c('Activity ~',str_c(curfeatures[picks], collapse = '+'))
 }
 cv_model <- function(formula) {
@@ -344,15 +354,14 @@ cv_model <- function(formula) {
   mean(results)
 }
 #at least two 
-possPicks = list(c(1, 2),c(1, 3),c(1, 4),c(1,5),c(2, 3),c(2, 4),c(2,5),c(3, 4),c(3,5),c(4,5),c(1, 2, 3),c(1, 2, 4),c(1, 3, 4),c(2, 3, 4),c(1,2,5),c(1,3,5),c(1, 2, 3, 4),c(1,2,3,5),c(1,2,3,4,5))
+possPicks = list(c(1, 2),c(1, 3),c(1, 4),c(1,5),c(2, 3),c(2, 4),c(2,5),c(3, 4),c(3,5),c(4,5),c(1, 2, 3),c(1,2,5),c(1,3,5),c(1,4,5),c(1, 2, 4),c(2,3,5),c(2,4,5),c(3,4,5),c(1, 3, 4),c(2, 3, 4),c(1, 2, 3, 4),c(1,2,3,4,5))
 all_formulas = sapply(possPicks,formulas)
 cv_scores = sapply(all_formulas, cv_model)
 bestFormula = all_formulas[which.max(cv_scores)]
 bestFormula
-#otter.lm = lm(Activity ~ Month + Trout.Interp + Caloric + Land + AmoebaNA, data = model.dat)
-
+otter.lm = lm(Activity ~ Month + Trout.Interp + Amoeba, data = model.dat)
 ```
-**explain results - month and trout** 
+
 
 2.1.1 Perform diagnostic analysis to check the assumptions of constant variance and normality using residual plots, QQ-plots or relevant tests. Potential outliers or influential points will be examined.
 
@@ -364,7 +373,17 @@ par(mfrow = c(2, 2))
 plot(otter.lm)
 ```
 
+When observing the diagnostics of the model, the model appears normal in the QQ-plot, as it follows the diagonal line with little curvature or deviation. However, the residuals do not appear to be truly homoskedastic, which could cause some concern?. In a residual vs. fitted plot, it is important to see the values be randomly and equally spread out across the 0 line. The values instead appear to be in a cone shape, fanning out towards the higher values. This indicates some hetersoskedasticity, which could mean the data points with larger influence and weight have more of a pull on the model. 
+
 ## Discussion and Conclusion
+
+*relation to my model*
+
+Amoeba and trout appear to have a significant relationship to otter activity. As related to the main food sources, they strongly influence how an otter will behave, as more or less active. This is important to note, as any environmental factors that happen to influence the mussels and their amoeba would be a significant predictor to how the otters will behave from that point. If something were to damage the mussels, the otters would be heavily impacted. 
+
+Future Suggestions
+- more otters for more collection 
+- track population of otters over time as well, see if there is any impact on population from environmental factors, is anything deathly?
 
 ## Appendix
 
