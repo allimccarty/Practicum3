@@ -210,6 +210,11 @@ ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05))
 
 In the pairs plot, we notice the relationships among each of the continuous variables. Caloric and Land have the strongest relationships, with a negative linear trend and strong correlation. Otherwise, the data appears to not have specific trends among the otters for the other variables, with weaker correlations and no evidence of linear trends. 
 
+Alternative Pairs Plot
+```{r}
+pairs(~Activity + Caloric +  `Water Excess`  + Amoeba + Alt.Interp + Trout.Interp, data=otter, upper.panel=NULL)
+```
+
 Let's look at each of the otters through time
 ```{r, fig.align='center', fig.cap="Patterns of Variables Through Time"}
 #New data frames to select variables specific to each site
@@ -260,13 +265,22 @@ ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_
 Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered. We observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1777), as compared to other islands (up to 800). Moreover, there is a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. 
 
 1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
+
+Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. We observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean levels of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba. The plot shows that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
+
 ```{r}
 ggplot(otter, aes(x = Amoeba, y=Caloric, color=Otter))+geom_point()
 
 # summary(RO918$Amoeba) ; Maybe something important to note here is the the minimum for RO-918 is .01, NOT 0, so there is in fact a difference in the way that this is coded versus the sites where this variable is not applicable
 ```
 
-Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. We observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean levels of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba. The plot shows that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
+```{r}
+df <- aggregate(otter[, 11], list(otter$Otter), mean)
+
+ggplot(data=df, aes(x=Group.1,y=Amoeba,fill=Group.1)) +  geom_bar(stat="identity") + ggtitle("Average Amoeba Level Across Otter Sites") + xlab("Otter Site") + ylab("Level of Amoeba")
+```
+
+
 
 1.2.6 Bar Graph Comparing Distance for locations with and without Mussels
 
