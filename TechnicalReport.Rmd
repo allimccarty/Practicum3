@@ -199,6 +199,10 @@ ggplot(data = otter.abnormal , aes(x = sqrt(value))) + stat_density() + facet_wr
 ggplot(data = otter.abnormal , aes(x = (value)^(1/3))) + stat_density() + facet_wrap(~variable, scales = "free")
 
 # do not include all of these graphs, only the transofrmations that we actually perform, all on one plot
+# Use the log transformation of Trout, and Land not transform Activity due to interpretability of the outcome variable -- ALLI to explain this in text ("sometimes you're just given bad data"  -Spencer)
+ggplot(data=otter, aes(x=Activity))+ stat_density()
+ggplot(data=otter, aes(x=log(Activity)))+ stat_density()
+ggplot(data=otter, aes(x=(Activity)^1/2))+ stat_density()
 ```
 
 - Add explanation here about which transformation we choose for the vars (could choose any of the three for any var, does not have to be the same transformation, obviously), and actually perform the transformation to the data in the dataset
