@@ -10,7 +10,7 @@ output: pdf_document
 
 - Describe otter population on Island of Isle Royale
 - Frame environmental concerns including the dog spa, and describe potential affect on otter
-- Our goal is to perform an anlaysis on trends of the environmental factors (briefly touch on specific aims)
+- Our goal is to perform an analysis on trends of the environmental factors (briefly touch on specific aims)
 - Summarize results in 1-2 sentences
 
 
@@ -27,7 +27,7 @@ Otters, like many other species on Isle Royale and worldwide, are vulnerable to 
 - A brief paragraph about how we did this, as well as more detail about the plan in the above paragraph
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message=FALSE,fig.pos= "h")
 library(readxl)
 library(tidyverse)
 library(dplyr)
@@ -157,6 +157,7 @@ ggarrange(o1, o2, common.legend = TRUE)
 ```
 
 
+
 ```{r, include=FALSE}
 # t-test for difference in sample means
 t.test(otter$Altitude, otter$Alt.Interp, paired = FALSE, conf.level = .95, alternative = "two.sided")
@@ -207,6 +208,8 @@ ggplot(data=otter, aes(x=(Activity)^1/2))+ stat_density()
 - Add explanation here about which transformation we choose for the vars (could choose any of the three for any var, does not have to be the same transformation, obviously), and actually perform the transformation to the data in the dataset
 
 Pairs Plot
+
+\begin{figure}[!htb]
 ```{r, fig.align='center', fig.cap="Association Matrix for the Collinearity of Continuous Variables"}
 interestcols <- c(2, 9, 12, 17)
 ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
@@ -216,7 +219,8 @@ ggplot(data=otter, aes(x=Caloric, y=log(Land)))+geom_point()
 In the pairs plot, we notice the relationships among each of the continuous variables. Caloric and Land have the strongest relationships, with a negative linear trend and strong correlation. Otherwise, the data appears to not have specific trends among the otters for the other variables, with weaker correlations and no evidence of linear trends. 
 
 Alternative Pairs Plot
-```{r}
+
+```{r, position = "center"}
 pairs(~Activity + Caloric +  `Water Excess`  + Amoeba + Alt.Interp + Trout.Interp, data=otter, upper.panel=NULL)
 ```
 
@@ -242,7 +246,7 @@ ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
 
 ```
 
-As we observe each of the otter's patterns for each variable over time, it is important to note an interesting change at month 10. As seen in the trends with Activity, Trout, and Amoeba, there is a difference in trend which could signify the opening of the dog spa on the island. When the dog spa opened, it would influence the environment around it, potentially harming the otter's food source. Otter Alpha? had a decrease in Amoeba, which signifies a decrease in their food source of mussels around that 10 month mark. On the other hand, Otter Alpha? also increased Activity around the same time, which could signify that it is working harder to find food and exerting more energy. 
+As we observe each of the otter's patterns for each variable over time, it is important to note an interesting change at month 10. As seen in the trends with Activity, Trout, and Amoeba, there is a difference in trend which could signify the opening of the dog spa on the island. When the dog spa opened, it would influence the environment around it, potentially harming the otter's food source. Otter RO-106 had a decrease in Amoeba, which signifies a decrease in their food source of mussels around that 10 month mark. On the other hand, Otter RO-106 also increased Activity around the same time, which could signify that it is working harder to find food and exerting more energy. 
 
 1.1.2 Frequency Distribution of each otter and sum of total covered miles
 
@@ -263,7 +267,8 @@ Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered 
 1.2.2 and 1.2.3 --> Ask about plan for mapping
 
 1.2.4 Scatterplot Showing the Relationship between Trout and Total Distance Covered
-```{r}
+\begin{center}
+```{r, position = "center"}
 ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE)
 ```
 
@@ -330,6 +335,7 @@ ranef(mmod)$Otter
 library(lattice)
 dotplot(ranef(mmod, condVar=TRUE))
 # diagnostics
+par(mfrow = c(2,2))
 qqnorm(residuals(mmod),main="")
 plot(fitted(mmod),residuals(mmod),xlab="Fitted",ylab="Residuals")
 abline(h=0)
