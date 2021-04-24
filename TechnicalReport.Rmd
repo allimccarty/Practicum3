@@ -250,6 +250,8 @@ As we observe each of the otter's patterns for each variable over time, it is im
 
 1.1.2 Frequency Distribution of each otter and sum of total covered miles
 
+Next, we examined the frequency distribution of total distance covered by each of the five otters. From *Table X*, we observe that Otter RO-599 is the most active at a total distance of 1722 [units] and Otter RO-859 is the least active at a total distance of 858 [units].
+
 ```{r}
 total.RO106 <- sum(RO106$Activity)
 total.RO255 <- sum(RO255$Activity)
@@ -264,44 +266,53 @@ Freq.Dist <- cbind(id=OtterNames, TotalDistance)
 Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered by Otter", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
-1.2.2 and 1.2.3 --> Ask about plan for mapping
 
 1.2.4 Scatterplot Showing the Relationship between Trout and Total Distance Covered
-\begin{center}
-```{r, position = "center"}
-ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE)
-```
 
-Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered. We observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1777), as compared to other islands (up to 800). Moreover, there is a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. 
-
-1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
-
-Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. We observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean levels of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba. The plot shows that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
+Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered, for each otter at its respective island. From *Figure X*, we observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1,777 units of trout), as compared to other islands (up to 800 units of trout). Moreover, the same island has a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. *Figure X* demonstrates that otters potentially cover more distance when there are higher levels of food source available to them.
 
 ```{r}
-ggplot(otter, aes(x = Amoeba, y=Caloric, color=Otter))+geom_point()
-
-# summary(RO918$Amoeba) ; Maybe something important to note here is the the minimum for RO-918 is .01, NOT 0, so there is in fact a difference in the way that this is coded versus the sites where this variable is not applicable
+ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE) + xlab("Lake Trout Population") + ylab("Activity") + ggtitle("Distance Covered by Lake Trout Population")
 ```
+
+# Optional table with max trout per otter
+```{r}
+max.trout <- aggregate(otter[, 17], list(otter$Otter), max)
+max.trout$Otter <- max.trout$Group.1
+max.trout$Trout <- max.trout$Trout.Interp
+formattable(max.trout[,3:4],"c","c")
+```
+
+Next, we created a bar graph to examine the presence of the green mussel amoeba in the green mussels at each otter site.From *Figure X*, we observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean level of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba.
 
 ```{r}
 df <- aggregate(otter[, 11], list(otter$Otter), mean)
 
-ggplot(data=df, aes(x=Group.1,y=Amoeba,fill=Group.1)) +  geom_bar(stat="identity") + ggtitle("Average Amoeba Level Across Otter Sites") + xlab("Otter Site") + ylab("Level of Amoeba")
+ggplot(data=df, aes(x=Group.1,y=Amoeba,fill=Group.1)) +  geom_bar(stat="identity") + ggtitle("Average Amoeba Level Across Otter Sites") + xlab("Otter Site") + ylab("Level of Amoeba") + theme(legend.position = "none")
 ```
 
 
+1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
+
+Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. From *Figure X*, we observe that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
+
+```{r}
+ggplot(otter, aes(x = Amoeba, y=Caloric, color=Otter))+geom_point() + ggtitle("Caloric Expenditure and Amoeba Level, Across Otter Sites") + xlab("Amoeba level") + ylab("Caloric Expenditure") 
+
+# summary(RO918$Amoeba) ; Maybe something important to note here is the the minimum for RO-918 is .01, NOT 0, so there is in fact a difference in the way that this is coded versus the sites where this variable is not applicable
+```
+
 
 1.2.6 Bar Graph Comparing Distance for locations with and without Mussels
+
+Next, we create a bar graph to examine the total distance covered each otter. From *Figure X*, we observe that RO-599 and RO-106 have the greatest total distance covered by otter (about 12,400 and 8,000 respectively). *Figure X* demonstrates that the presence of mussels does not appear to have an association with total distance covered.
 
 ```{r}
 Mussel<- c("No", "No", "Yes", "Yes", "Yes")
 Freq.Dist2 <- data.frame(OtterNames, TotalDistance, Mussel)
 ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
-  geom_bar(stat="identity")
+  geom_bar(stat="identity") + ggtitle("Total Distance Covered by Otter") + xlab("Otter") + ylab("Total Distance")
 ```
-
-Next, we create a bar graph to examine the total distance covered each otter. We observe that RO-599 and RO-106 have the greatest total distance covered by otter (about 12,400 and 8,000 respectively). Interestingly, the presence of mussels does not appear to have any association with total distance covered.
 
 1.2.7 Plot Monthly distance covered by each otter
 
