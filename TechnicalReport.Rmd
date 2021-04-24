@@ -174,14 +174,14 @@ t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, altern
 ```
 
 
-
 # Exploratory Data Analysis
 
-As a preliminary step in data analysis, we will check the normality assumption and the distribution plots for all of the variables. We constructed QQPlots for all of the continuous numeric variables, which is included as Figure 2 of the appendix. In addition, we constructed density distributions for continuous variables in Figure 3.  Based on the QQPlots and the density distributions, variables representing activity, trout (the transformed variable), and land deviate from the normal distribution assumption.  All of the aforementioned variables have a strong right-skew. 
+As a preliminary step in data analysis, we checked the normality assumption for all continuous variables. We constructed QQPlots for all of the continuous numeric variables, which are included as Figure 2 of the appendix.  The QQPlots indicated that most continuous variables satisfied the normality assumption.  However, variables representing land, trout (the interpolated/extrapolated version), and activity merited further analysis, as their distributions did not immediately meet the normality assumption.  We constructed density distributions for these potentially abnormal continuous variables in Figure 3.  Based on the QQPlots and the density distributions, variables representing activity, trout, and land deviate from the normal distribution assumption.  All of the aforementioned variables have a strong right-skew. 
 
-We investigated several different methods commonly used to alleviate skews observed in the data. These methods included performing and visualizing log transformations, square root transformations, and cubic root transformations, which are included in Figure 3 of the appendix.The square root transformation was insufficient at alleviating the skew in any of the variables. The cubic root transformation was also insufficient at alleviating the skew in the activity and land variable, but did alleviate the skew in the trout variable.  The log transformation *did help the land and trout variable* (wording?), but was insufficient for the activity variable.  Based on the analysis of these three transformations, we applied a log transformation to the land and trout variables to be included in the model process for this investigation. 
+We investigated several different methods commonly used to alleviate skews observed in the data. These methods included performing and visualizing a log transformation, square root transformation, and cubic root transformation, which are included in Figure 3 of the appendix. The square root transformation was insufficient at alleviating the skew in any of the variables. The cubic root transformation was also insufficient at alleviating the skew in the activity and land but did alleviate the skew in the trout variable.  The log transformation successfully alleviated the skew in the land and trout variable but was insufficient for the activity variable.  Based on the analysis of these three transformations, we applied a log transformation to the land and trout variables to be included in the model process for this investigation. 
 
-None of the aformentioned transformations were successful in alleviating the skew in the activity variable.  When these transformations were applied, we observed bimodal data, which is incompatible with the normal distribution.  Since these transformations did not help and the application of a transformation to the response variable increases complexity and lessens interpretability of the model, we decided to not perform a transformation on the activity variable.  The log transformation of the aformentioned abnormal variables is included in Figure 4.
+None of the aforementioned transformations were successful in alleviating the skew in the activity variable.  When these transformations were applied, the distribution of activity was increasingly bimodal, which is incompatible with the normal distribution.  Since these transformations did not help and the application of a transformation to the response variable increases complexity and adds challenges to the interpretability of the model, we decided to not perform a transformation on the activity variable.  The log transformation of the aforementioned abnormal variables is included in Figure 4.
+
 
 ```{r, include=FALSE}
 #QQNorm Plots
@@ -215,8 +215,7 @@ Pairs Plot
 \begin{figure}[!htb]
 ```{r, fig.align='center', fig.cap="Association Matrix for the Collinearity of Continuous Variables"}
 interestcols <- c(2, 9, 12, 17)
-ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
-ggplot(data=otter, aes(x=Caloric, y=log(Land)))+geom_point()
+ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05))
 ```
 
 In the pairs plot, we notice the relationships among each of the continuous variables. Caloric and Land have the strongest relationships, with a negative linear trend and strong correlation. Otherwise, the data appears to not have specific trends among the otters for the other variables, with weaker correlations and no evidence of linear trends. 
@@ -228,7 +227,7 @@ pairs(~Activity + Caloric +  `Water Excess`  + Amoeba + Alt.Interp + Trout.Inter
 ```
 
 Let's look at each of the otters through time
-```{r, fig.align='center', fig.cap="Patterns of Variables Through Time"}
+```{r, fig.align='center', fig.cap="Plot of all continuous variables through the 20-month time period in the study"}
 #New data frames to select variables specific to each site
 RO599 <- filter(otter[c(1, numericColumns)], Otter=="RO-599")
 RO106 <- filter(otter[c(1, numericColumns)], Otter=="RO-106")
@@ -238,20 +237,20 @@ RO859 <- filter(otter[c(1, numericColumns)], Otter=="RO-859")
 
 # Activity, Altitude, Trout, Caloric, Water
 
-p1 <- ggplot(data= otter, aes(y=Activity, x=Month, color=Site))+geom_smooth(se=FALSE)
-p2 <- ggplot(data= otter, aes(y=Alt.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
-p3 <- ggplot(data= otter, aes(y=Trout.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
-p4 <- ggplot(data= otter, aes(y=Caloric, x=Month, color=Site))+geom_smooth(se=FALSE)
-p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Site))+geom_smooth(se=FALSE)
-p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Site))+geom_smooth(se=FALSE)
-ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
-
+p1 <- ggplot(data= otter, aes(y=Activity, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p2 <- ggplot(data= otter, aes(y=Alt.Interp, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p3 <- ggplot(data= otter, aes(y=Trout.Interp, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p4 <- ggplot(data= otter, aes(y=Caloric, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Otter))+geom_smooth(se=FALSE)
+gg.obj2 <- ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
+annotate_figure(gg.obj2,
+               top = text_grob("Patterns of Variables Through Time"))
 
 ```
 
 As we observe each of the otter's patterns for each variable over time, it is important to note an interesting change at month 10. As seen in the trends with Activity, Trout, and Amoeba, there is a difference in trend which could signify the opening of the dog spa on the island. When the dog spa opened, it would influence the environment around it, potentially harming the otter's food source. Otter RO-106 had a decrease in Amoeba, which signifies a decrease in their food source of mussels around that 10 month mark. On the other hand, Otter RO-106 also increased Activity around the same time, which could signify that it is working harder to find food and exerting more energy. 
 
-1.1.2 Frequency Distribution of each otter and sum of total covered miles
 
 ```{r}
 total.RO106 <- sum(RO106$Activity)
@@ -267,7 +266,6 @@ Freq.Dist <- cbind(id=OtterNames, TotalDistance)
 Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered by Otter", label = "Table 2") %>% kable_classic_2(full_width = F)
 ```
 
-1.2.2 and 1.2.3 --> Ask about plan for mapping
 
 1.2.4 Scatterplot Showing the Relationship between Trout and Total Distance Covered
 \begin{center}
@@ -276,8 +274,6 @@ ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_
 ```
 
 Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered. We observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1777), as compared to other islands (up to 800). Moreover, there is a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. 
-
-1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
 
 Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. We observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean levels of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba. The plot shows that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
 
@@ -294,9 +290,6 @@ ggplot(data=df, aes(x=Group.1,y=Amoeba,fill=Group.1)) +  geom_bar(stat="identity
 ```
 
 
-
-1.2.6 Bar Graph Comparing Distance for locations with and without Mussels
-
 ```{r}
 Mussel<- c("No", "No", "Yes", "Yes", "Yes")
 Freq.Dist2 <- data.frame(OtterNames, TotalDistance, Mussel)
@@ -308,7 +301,7 @@ Next, we create a bar graph to examine the total distance covered each otter. We
 
 1.2.7 Plot Monthly distance covered by each otter
 
-- Already completed in the important vars v. Month section
+## Model Process
 
 Linear mixed models are an extension of simple linear models to allow both fixed and random effects, where non-independence exists in the data. A fixed effect is an unknown constant that we try to estimate from the data. A random effect is a random variable-- here, we are less interested in estimating the random effect and more so, the parameters that describe the distribution of the random effect. Using a random effects approach allows us to try to use our analysis to describe the larger population of otters beyond our sample of five otters. 
 
