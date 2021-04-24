@@ -3,15 +3,21 @@ title: Analysis of Environmental and Man-Made Factors Affecting Otter Population
   on Isle Royale
 author: "Allison McCarty, Jordan Majoros, Shelley Rao"
 date: "4/20/2021"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
-# Abstract (save for the end)
+# Abstract (edits at the end to include results)
 
+<<<<<<< HEAD
+Otters in the island of Isle Royale in Michigan are classified as keystons species, and therefore their conservation is critical to maintain the biodiversity and ecological stability of the ecosystem. There are many current threats to the well-being of otters in Isle Royale, including the introduction of a dog spa on the island.  We performed an analysis on using data provided by International Hugs for Otters (IHO) to investigate seasonal trends and environmental factors affecting otter species on the island, and to determine the relationship between food source and otter activity.  We devoloped two models for this purpose **Summarize models and results in 1-2 sentences**
+=======
 - Describe otter population on Island of Isle Royale
 - Frame environmental concerns including the dog spa, and describe potential affect on otter
 - Our goal is to perform an analysis on trends of the environmental factors (briefly touch on specific aims)
 - Summarize results in 1-2 sentences
+>>>>>>> 1d17e730cf294b608069d21b6855bcbd8f70014a
 
 
 # Introduction (edits at the end to include results)
@@ -63,6 +69,7 @@ transpose_df <- function(df) {
     tibble::as_tibble(.)
   return(t_df)
 }
+theme_set(theme_bw())
 ```
 
 
@@ -76,10 +83,10 @@ From the given data there are 100 observations. However, there are 84 (84%) obse
 
 The amoeba variable represents a scaled measure of the presence of green mussel amoeba in green mussels, which is an important food source for some otters.  However, green mussels are not present in two of the five regions of the study and are therefore not applicable to two of the observed otter populations (RO-255 and RO-106).  The water variable represents a scaled measure of inland water availability.  This metric is not applicable to costal otters and therefore not observed in two of the otter populations in this study (RO-599 and RO-859).  
 
-To investigate the missingness pattern of the data, we constructed a missingness plot in Figure X.  The plot maps missingness by month and otter raft, where the color of the graph is scaled to represent the frequency of missingness.  As mentioned, the amoeba and water variables are not applicable to all otter types, so we expect to see a distinct missingness pattern. Missingness of these variables is dependent on otter type, as demonstrated by the yellow bars in the bottom panel of Figure X.  On the other hand, missingness in variables representing altitude and trout are relatively infrequent in all otter rafts and at all time points, which suggests that data for these two variables are missing at random. Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for altitude and trout.
+To investigate the missingness pattern of the data, we constructed a missingness plot in Figure 1.  The plot maps missingness by month and otter raft, where the color of the graph is scaled to represent the frequency of missingness.  As mentioned, the amoeba and water variables are not applicable to all otter types, so we expect to see a distinct missingness pattern. Missingness of these variables is dependent on otter type, as demonstrated by the yellow bars in the bottom panel of Figure 1.  On the other hand, missingness in variables representing altitude and trout are relatively infrequent in all otter rafts and at all time points, which suggests that data for these two variables are missing at random. Since there is a systemic cause for missingness in these two variables, we will perform different data processing to adjust for missing values compared to the method used for altitude and trout.
 
 
-```{r, fig.align='center', fig.cap="Missingness Plot of Variables by Month and Otter"}
+```{r, fig.align='center', fig.cap="Missingness plot for all variables included in the study by month and otter"}
 library(naniar)
 otter.missing <- otter[,-c(7, 8, 15)]
 miss1<- gg_miss_fct(x = otter.missing, fct = Month) + labs(title = "Missingness Pattern by Month")
@@ -96,9 +103,9 @@ Amoeba and water were not applicable to two of the five sites, meaning that thes
 
 The variables representing altitude and trout had 18 and 16 missing values, respectively. We determined above that these values were missing at random.  These variables represent the average change in altitude and amount of trout present over the month of observation.  As the data is aggregated to represent scaled measurements over certain months, we wanted to address missing observations such that seasonal patterns and trends are observed. Therefore, we used an interpolation method to correct the missing data in the set for these two variables.  Using the interpolation method, missing values for either of these variables were replaced with the average of the measurement for that value for the month prior and after that specific observation. However, the interpolation method does not work for observations in the first of last month of the study, as average values cannot be found without having information on both the moth prior and the month after a specific observation.  For missing values in either the first or last month, an extrapolation method was used instead.  Using the extrapolation method, missing values in the first month of the study were replaced with the value of that observation in the second month, whereas missing values in the last month (Month 20) were replaced with the value of that observation in the second-to-last month (Month 19).
 
-Figure X shows overlapping density plots for trout and altitude variables before and after the interpolation and extrapolation methods were applied to replace missing values.  The plots show significant overlaps with minor shifts in the density distribution after missing data was filled in.  Descriptive statistics for altitude and trout before and after data processing are also included in Table X.  There are some discrepancies in mean, standard deviation, and variances of the distributions.  To confirm that these discrepancies were not significant, we performed a two-sample t-test for differences in the mean for both altitude and trout before and after data processing.  We obtained p-values of 0.9663 and 0.7021 for the comparison of before and after data processing in these variables, respectively, confirming that the data processing did not cause a significant change in the distribution about the mean.
+Figure 2 shows overlapping density plots for trout and altitude variables before and after the interpolation and extrapolation methods were applied to replace missing values.  The plots show significant overlaps with minor shifts in the density distribution after missing data was filled in.  Descriptive statistics for altitude and trout before and after data processing are also included in Table 1 of the appendix.  There are some discrepancies in mean, standard deviation, and variances of the distributions.  To confirm that these discrepancies were not significant, we performed a two-sample t-test for differences in the mean for both altitude and trout before and after data processing.  We obtained p-values of 0.9663 and 0.7021 for the comparison of before and after data processing in these variables, respectively, confirming that the data processing did not cause a significant change in the distribution about the mean.
 
-The final data set contains 100 total observations of 17 variables with 0 missing values. Descriptive statistics for the final dataset are included in Table X in the appendix.
+The final data set contains 100 total observations of 17 variables with 0 missing values. Descriptive statistics for the final dataset are included in Table 2 of the appendix.
 
 
 ```{r}
@@ -144,7 +151,7 @@ kbl(caption = "Descriptive Statistics for Quantitative Variables Before Data Pro
 ```
 
 
-```{r, fig.align='center', fig.cap="Density Distributions for Altitude and Trout Before and After Data Transformation"}
+```{r, fig.align='center', fig.cap="Density distributions for altitude and trout before and after interpolation and extrapolation methods were applied"}
 #Sample data
 Altitude <- c(otter$Altitude, otter$Alt.Interp)
 Trout <- c(otter$Trout, otter$Trout.Interp)
@@ -153,7 +160,9 @@ OverlapData <- data.frame(Altitude, Trout, Transform)
 #Plot
 o1 <- ggplot(OverlapData, aes(x = Altitude, fill = Transform)) + geom_density(alpha = 0.5)
 o2 <- ggplot(OverlapData, aes(x = Trout, fill = Transform)) + geom_density(alpha = 0.5)
-ggarrange(o1, o2, common.legend = TRUE)
+gg.obj1 <- ggarrange(o1, o2, common.legend = TRUE)
+annotate_figure(gg.obj1,
+               top = text_grob("Density Distributions For Missing Data"))
 ```
 
 
@@ -165,12 +174,14 @@ t.test(otter$Trout, otter$Trout.Interp, paired = FALSE, conf.level = .95, altern
 ```
 
 
-
 # Exploratory Data Analysis
 
-First, we will check the normality assumption and the distribution plots for all of the variables. We made QQPlots for all of the continuous numeric variables, which is included as Figure X in the appendix.  Based on the plots, we think that caloric intake, water excess, and altitude are approximately normal (at least normal enough that they do not merit transformations).
+As a preliminary step in data analysis, we checked the normality assumption for all continuous variables. We constructed QQPlots for all of the continuous numeric variables, which are included as Figure 2 of the appendix.  The QQPlots indicated that most continuous variables satisfied the normality assumption.  However, variables representing land, trout (the interpolated/extrapolated version), and activity merited further analysis, as their distributions did not immediately meet the normality assumption.  We constructed density distributions for these potentially abnormal continuous variables in Figure 3.  Based on the QQPlots and the density distributions, variables representing activity, trout, and land deviate from the normal distribution assumption.  All of the aforementioned variables have a strong right-skew. 
 
-Based on the QQPlots, variables representing activity, trout, amoeba, land, and water deviate from the normal distribution assumption. We will take a closer look at these variables and try a log transformation if necessary.
+We investigated several different methods commonly used to alleviate skews observed in the data. These methods included performing and visualizing a log transformation, square root transformation, and cubic root transformation, which are included in Figure 3 of the appendix. The square root transformation was insufficient at alleviating the skew in any of the variables. The cubic root transformation was also insufficient at alleviating the skew in the activity and land but did alleviate the skew in the trout variable.  The log transformation successfully alleviated the skew in the land and trout variable but was insufficient for the activity variable.  Based on the analysis of these three transformations, we applied a log transformation to the land and trout variables to be included in the model process for this investigation. 
+
+None of the aforementioned transformations were successful in alleviating the skew in the activity variable.  When these transformations were applied, the distribution of activity was increasingly bimodal, which is incompatible with the normal distribution.  Since these transformations did not help and the application of a transformation to the response variable increases complexity and adds challenges to the interpretability of the model, we decided to not perform a transformation on the activity variable.  The log transformation of the aforementioned abnormal variables is included in Figure 4.
+
 
 ```{r, include=FALSE}
 #QQNorm Plots
@@ -184,36 +195,27 @@ mapply(newfun, otter.cont, cont.labels)
 ```
 
 
-We do not expect that Water and Amoeba will be normal based on the way that we filled in the missing data.  Based on the plot, most are normal.  
-
 ```{r , fig.align='center', fig.cap="Density Distributions for Continuous Variables"}
-otter.abnormal <- otter.cont[c(1, 3, 7)]
+otter.abnormal <- otter.cont[c(1, 7)]
+otter.abnormal$Trout.Interp <- otter$Trout.Interp #Note that this is Trout.Interp
 library(reshape2)
 otter.abnormal<- melt(otter.abnormal)
-ggplot(data = otter.abnormal , aes(x = value)) + stat_density() + facet_wrap(~variable, scales = "free")
-# We could take a closer look at Activity, Trout, and Land.
-
-#Now, let's take a transformation of all of these variables
-ggplot(data = otter.abnormal , aes(x = log(value))) + stat_density() + facet_wrap(~variable, scales = "free")
-ggplot(data = otter.abnormal , aes(x = sqrt(value))) + stat_density() + facet_wrap(~variable, scales = "free")
-ggplot(data = otter.abnormal , aes(x = (value)^(1/3))) + stat_density() + facet_wrap(~variable, scales = "free")
-
-# do not include all of these graphs, only the transofrmations that we actually perform, all on one plot
-# Use the log transformation of Trout, and Land not transform Activity due to interpretability of the outcome variable -- ALLI to explain this in text ("sometimes you're just given bad data"  -Spencer)
-ggplot(data=otter, aes(x=Activity))+ stat_density()
-ggplot(data=otter, aes(x=log(Activity)))+ stat_density()
-ggplot(data=otter, aes(x=(Activity)^1/2))+ stat_density()
+ggplot(data = otter.abnormal , aes(x = value)) + stat_density() + facet_wrap(~variable, scales = "free") + ggtitle("Density Distributions of Abnormal Data")
 ```
 
-- Add explanation here about which transformation we choose for the vars (could choose any of the three for any var, does not have to be the same transformation, obviously), and actually perform the transformation to the data in the dataset
+
+```{r, fig.align='center', fig.cap="Log Transformation Density Distributions for Continuous Variables"}
+ggplot(data = otter.abnormal , aes(x = log(value))) + stat_density() + facet_wrap(~variable, scales = "free") + ggtitle("Density Distributions of Abnormal Data with a Log Transformation")
+# Use the log transformation of Trout, and Land not transform Activity due to interpretability of the outcome variable -- ALLI to explain this in text ("sometimes you're just given bad data"  -Spencer)
+```
+
 
 Pairs Plot
 
 \begin{figure}[!htb]
 ```{r, fig.align='center', fig.cap="Association Matrix for the Collinearity of Continuous Variables"}
 interestcols <- c(2, 9, 12, 17)
-ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
-ggplot(data=otter, aes(x=Caloric, y=log(Land)))+geom_point()
+ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05))
 ```
 
 In the pairs plot, we notice the relationships among each of the continuous variables. Caloric and Land have the strongest relationships, with a negative linear trend and strong correlation. Otherwise, the data appears to not have specific trends among the otters for the other variables, with weaker correlations and no evidence of linear trends. 
@@ -225,7 +227,7 @@ pairs(~Activity + Caloric +  `Water Excess`  + Amoeba + Alt.Interp + Trout.Inter
 ```
 
 Let's look at each of the otters through time
-```{r, fig.align='center', fig.cap="Patterns of Variables Through Time"}
+```{r, fig.align='center', fig.cap="Plot of all continuous variables through the 20-month time period in the study"}
 #New data frames to select variables specific to each site
 RO599 <- filter(otter[c(1, numericColumns)], Otter=="RO-599")
 RO106 <- filter(otter[c(1, numericColumns)], Otter=="RO-106")
@@ -235,20 +237,20 @@ RO859 <- filter(otter[c(1, numericColumns)], Otter=="RO-859")
 
 # Activity, Altitude, Trout, Caloric, Water
 
-p1 <- ggplot(data= otter, aes(y=Activity, x=Month, color=Site))+geom_smooth(se=FALSE)
-p2 <- ggplot(data= otter, aes(y=Alt.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
-p3 <- ggplot(data= otter, aes(y=Trout.Interp, x=Month, color=Site))+geom_smooth(se=FALSE)
-p4 <- ggplot(data= otter, aes(y=Caloric, x=Month, color=Site))+geom_smooth(se=FALSE)
-p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Site))+geom_smooth(se=FALSE)
-p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Site))+geom_smooth(se=FALSE)
-ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
-
+p1 <- ggplot(data= otter, aes(y=Activity, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p2 <- ggplot(data= otter, aes(y=Alt.Interp, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p3 <- ggplot(data= otter, aes(y=Trout.Interp, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p4 <- ggplot(data= otter, aes(y=Caloric, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p5<- ggplot(data= otter, aes(y=Water, x=Month, color=Otter))+geom_smooth(se=FALSE)
+p6 <- ggplot(data= otter, aes(y=Amoeba, x=Month, color=Otter))+geom_smooth(se=FALSE)
+gg.obj2 <- ggarrange(p1, p2, p3, p4, p5, p6, common.legend = TRUE)
+annotate_figure(gg.obj2,
+               top = text_grob("Patterns of Variables Through Time"))
 
 ```
 
 As we observe each of the otter's patterns for each variable over time, it is important to note an interesting change at month 10. As seen in the trends with Activity, Trout, and Amoeba, there is a difference in trend which could signify the opening of the dog spa on the island. When the dog spa opened, it would influence the environment around it, potentially harming the otter's food source. Otter RO-106 had a decrease in Amoeba, which signifies a decrease in their food source of mussels around that 10 month mark. On the other hand, Otter RO-106 also increased Activity around the same time, which could signify that it is working harder to find food and exerting more energy. 
 
-1.1.2 Frequency Distribution of each otter and sum of total covered miles
 
 Next, we examined the frequency distribution of total distance covered by each of the five otters. From *Table X*, we observe that Otter RO-599 is the most active at a total distance of 1722 [units] and Otter RO-859 is the least active at a total distance of 858 [units].
 
@@ -268,8 +270,19 @@ Freq.Dist %>%  kbl(caption = "Frequency Distribution for Total Distance Covered 
 
 
 1.2.4 Scatterplot Showing the Relationship between Trout and Total Distance Covered
+<<<<<<< HEAD
 
 Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered, for each otter at its respective island. From *Figure X*, we observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1,777 units of trout), as compared to other islands (up to 800 units of trout). Moreover, the same island has a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. *Figure X* demonstrates that otters potentially cover more distance when there are higher levels of food source available to them.
+=======
+\begin{center}
+```{r, position = "center"}
+ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE)
+```
+
+Next, we created a scatterplot to examine the relationship between lake trout population and total distance covered. We observe that there is a generally positive association between lake trout population and total distance covered. On average, islands resided by RO-255, RO-859, RO-918 have lower activity levels than islands resided by RO-106 and RO-599. Interestingly, the island resided by RO-599 have a much higher lake trout population (up to 1777), as compared to other islands (up to 800). Moreover, there is a noticeably steeper slope as lake trout population increases which indicates much more activity gains at higher levels of trout. 
+
+Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. We observe that amoeba levels differ across islands, with the island resided by RO-599 having the highest mean levels of amoeba, followed by island resided by RO-859, then island resided by RO-918. Islands resided by otters RO-106 and RO-255 have no presence of green mussel amoeba. The plot shows that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
+>>>>>>> c029ed95f99bb877fea160c5a6e6ecfe588dcde9
 
 ```{r}
 ggplot(otter, aes(x = Trout.Interp, y=Activity, color=Otter))+geom_point()+geom_smooth(se=FALSE) + xlab("Lake Trout Population") + ylab("Activity") + ggtitle("Distance Covered by Lake Trout Population")
@@ -292,6 +305,7 @@ ggplot(data=df, aes(x=Group.1,y=Amoeba,fill=Group.1)) +  geom_bar(stat="identity
 ```
 
 
+<<<<<<< HEAD
 1.2.5 Scatterplot Showing the Relationship between amount of Amoeba and Caloric Expenditure
 
 Next, we created a scatterplot to examine the relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure. From *Figure X*, we observe that there is no apparent relationship between the presence of the green mussel amoeba in the green mussels and caloric expenditure.
@@ -307,6 +321,8 @@ ggplot(otter, aes(x = Amoeba, y=Caloric, color=Otter))+geom_point() + ggtitle("C
 
 Next, we create a bar graph to examine the total distance covered each otter. From *Figure X*, we observe that RO-599 and RO-106 have the greatest total distance covered by otter (about 12,400 and 8,000 respectively). *Figure X* demonstrates that the presence of mussels does not appear to have an association with total distance covered.
 
+=======
+>>>>>>> c029ed95f99bb877fea160c5a6e6ecfe588dcde9
 ```{r}
 Mussel<- c("No", "No", "Yes", "Yes", "Yes")
 Freq.Dist2 <- data.frame(OtterNames, TotalDistance, Mussel)
@@ -316,7 +332,7 @@ ggplot(data=Freq.Dist2, aes(x=OtterNames, y=TotalDistance, fill=Mussel)) +
 
 1.2.7 Plot Monthly distance covered by each otter
 
-- Already completed in the important vars v. Month section
+## Model Process
 
 Linear mixed models are an extension of simple linear models to allow both fixed and random effects, where non-independence exists in the data. A fixed effect is an unknown constant that we try to estimate from the data. A random effect is a random variable-- here, we are less interested in estimating the random effect and more so, the parameters that describe the distribution of the random effect. Using a random effects approach allows us to try to use our analysis to describe the larger population of otters beyond our sample of five otters. 
 
@@ -439,5 +455,10 @@ cont.labels <- colnames(otter.cont)
 newfun <- function(x, y) qqPlot(x, main = paste(y, "QQ Plot", sep = " "))
 par(mfrow = c(2, 3))
 mapply(newfun, otter.cont, cont.labels)
+
+#Data Transformation Plots
+ggplot(data = otter.abnormal , aes(x = sqrt(value))) + stat_density() + facet_wrap(~variable, scales = "free")
+ggplot(data = otter.abnormal , aes(x = (value)^(1/3))) + stat_density() + facet_wrap(~variable, scales = "free")
+
 ```
 
