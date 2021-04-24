@@ -210,6 +210,7 @@ Pairs Plot
 ```{r, fig.align='center', fig.cap="Association Matrix for the Collinearity of Continuous Variables"}
 interestcols <- c(2, 9, 12, 17)
 ggpairs(otter, columns = interestcols, ggplot2::aes(colour= Site, alpha=.05)) 
+ggplot(data=otter, aes(x=Caloric, y=log(Land)))+geom_point()
 ```
 
 In the pairs plot, we notice the relationships among each of the continuous variables. Caloric and Land have the strongest relationships, with a negative linear trend and strong correlation. Otherwise, the data appears to not have specific trends among the otters for the other variables, with weaker correlations and no evidence of linear trends. 
